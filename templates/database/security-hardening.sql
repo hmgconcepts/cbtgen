@@ -3,13 +3,40 @@
 --   Maintenance EXTRACT from complete-schema.sql — everything here is already
 --   inside the master file. Run this ONLY to repair/inspect one subsystem on an
 --   existing installation without touching anything else. All statements are
---   idempotent (OR REPLACE / IF NOT EXISTS / ON CONFLICT), so re-running is safe.
+--   idempotent, so re-running is safe.
 --   New installs: run database/complete-schema.sql ONCE and you are done.
 -- ============================================================================
 BEGIN;
--- ============================================================================
+/* -- module function reset: drop this module's functions in ANY historical
+   -- signature before recreating them (prevents 42P13 return-type errors on
+   -- upgraded installs). CASCADE is safe: this module recreates everything it
+   -- owns below, and no data is touched. */
+DO $modulereset$
+DECLARE fn RECORD;
+BEGIN
+  FOR fn IN
+    SELECT p.oid::regprocedure AS signature
+    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname IN (
+      'is_platform_admin',
+      'is_platform_owner',
+      'is_owner',
+      'get_exam_teacher_id',
+      'is_exam_open_for_submission'
+      )
+  LOOP
+    BEGIN
+      EXECUTE 'DROP FUNCTION ' || fn.signature || ' CASCADE';
+      RAISE NOTICE 'module reset: dropped %', fn.signature;
+    EXCEPTION WHEN undefined_function THEN NULL;
+              WHEN dependent_objects_still_exist THEN NULL;
+    END;
+  END LOOP;
+END
+$modulereset$;
 
--- 5.1 Check Platform Admin
+
 CREATE OR REPLACE FUNCTION public.is_platform_admin()
 RETURNS BOOLEAN
 LANGUAGE sql
@@ -62,7 +89,27 @@ AS $$
   SELECT teacher_id FROM public.exams WHERE id = p_exam_id;
 $$;
 
--- ============================================================================
+-- 5.5 Check If Exam Open for Submission
+CREATE OR REPLACE FUNCTION public.is_exam_open_for_submission(p_exam_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public, pg_temp
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.exams
+    WHERE id = p_exam_id
+      AND is_open = true
+      AND is_archived = false
+      AND (close_at IS NULL OR close_at > NOW())
+      AND (start_at IS NULL OR start_at <= NOW())
+  );
+$$;
+
+-- 5.6 Audit Logger (callable by any authenticated user; anonymous events
+--      are tagged 'system')
+
 -- SECTION 11 — ROW LEVEL SECURITY (RLS) POLICIES
 -- ============================================================================
 -- Every policy is dropped-then-recreated so this file stays safe to re-run.
@@ -172,5 +219,7 @@ CREATE POLICY "Admins write platform settings" ON public.platform_settings FOR A
 -- 11.10 Heartbeat — intentionally NO policies: direct table access is denied
 --      to everyone; only the SECURITY DEFINER RPC can touch it.
 REVOKE ALL ON TABLE public.sc_heartbeat FROM anon, authenticated;
+
+-- ============================================================================
 
 COMMIT;

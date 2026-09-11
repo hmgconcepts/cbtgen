@@ -3,12 +3,37 @@
 --   Maintenance EXTRACT from complete-schema.sql — everything here is already
 --   inside the master file. Run this ONLY to repair/inspect one subsystem on an
 --   existing installation without touching anything else. All statements are
---   idempotent (OR REPLACE / IF NOT EXISTS / ON CONFLICT), so re-running is safe.
+--   idempotent, so re-running is safe.
 --   New installs: run database/complete-schema.sql ONCE and you are done.
 -- ============================================================================
 BEGIN;
+/* -- module function reset: drop this module's functions in ANY historical
+   -- signature before recreating them (prevents 42P13 return-type errors on
+   -- upgraded installs). CASCADE is safe: this module recreates everything it
+   -- owns below, and no data is touched. */
+DO $modulereset$
+DECLARE fn RECORD;
+BEGIN
+  FOR fn IN
+    SELECT p.oid::regprocedure AS signature
+    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname IN (
+      'log_backup_event',
+      'admin_get_drive_backups'
+      )
+  LOOP
+    BEGIN
+      EXECUTE 'DROP FUNCTION ' || fn.signature || ' CASCADE';
+      RAISE NOTICE 'module reset: dropped %', fn.signature;
+    EXCEPTION WHEN undefined_function THEN NULL;
+              WHEN dependent_objects_still_exist THEN NULL;
+    END;
+  END LOOP;
+END
+$modulereset$;
 
--- 2.7 System Backups & Drive Sync History
+
 CREATE TABLE IF NOT EXISTS public.system_backups (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   institution_id UUID REFERENCES public.institutions(id) ON DELETE SET NULL,
@@ -22,18 +47,6 @@ CREATE TABLE IF NOT EXISTS public.system_backups (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2.8 Keep-Alive Heartbeat (FREE-TIER PROTECTION — Layer 0, table)
---     One single row touched by every keep-alive layer. Supabase pauses
---     free projects after ~7 days without REAL database activity, so each
-
--- ============================================================================
--- SECTION 3 — SCHEMA EVOLUTION GUARDS (upgrade older deployments in place)
--- ============================================================================
--- These ALTERs make the script safe to run on databases created with an
--- OLDER version of this file: missing columns are added, existing ones are
--- left untouched. Each line is a no-op when the column already exists.
-
--- institutions: Drive + license columns (added v3.1)
 ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS drive_client_id TEXT DEFAULT '';
 ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS drive_folder_id TEXT DEFAULT '';
 ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS drive_sync_enabled BOOLEAN DEFAULT false;
@@ -42,6 +55,9 @@ ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS drive_last_backup TIMES
 ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS license_token TEXT DEFAULT '';
 ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS license_data JSONB DEFAULT '{}'::jsonb;
 ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS last_keepalive_at TIMESTAMPTZ DEFAULT NOW();
+
+-- exams: advanced proctoring / scheduling columns (added v3.1)
+
 
 -- 10.6 Log a backup event (Drive sync / envelope / local JSON history)
 CREATE OR REPLACE FUNCTION public.log_backup_event(

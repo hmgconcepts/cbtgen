@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Teacher dashboard for HMG Academy CBT Pro. Create online exams, upload CSV question banks, manage 17 question types, view analytics and export results.">
+<meta name="description" content="Teacher dashboard for HMG Academy CBT Pro. Create online exams, upload CSV question banks, manage 20 question types, view analytics and export results.">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#10b981">
 <title>HMG Academy CBT | Teacher Dashboard</title>
@@ -696,6 +696,9 @@ code{background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px;font-
       <button class="nav-item" onclick="window.location.href='cbt-prompts.html'" id="nav-prompts">
         <span class="nav-icon">🤖</span> AI Prompts Studio
       </button>
+      <button class="nav-item" onclick="window.location.href='question-types.html'" id="nav-types">
+        <span class="nav-icon">📖</span> Question Types Guide
+      </button>
       <div class="nav-section-label">Account</div>
       <button class="nav-item" onclick="navigate('settings')" id="nav-settings">
         <span class="nav-icon">⚙️</span> Settings
@@ -1030,156 +1033,16 @@ code{background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px;font-
             <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">Columns 1–7 are the base format compatible with all older question banks. Columns 8–14 are optional — leave them blank for MCQ questions. Wrap all cells in double quotes if they contain commas.</div>
           </div>
 
-          <!-- TYPE REFERENCE TABLE -->
-          <div style="font-size:12px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Question Type Reference — Col8: Type</div>
-          <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;">
-
-            <!-- MCQ -->
-            <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(59,130,246,0.04);">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;background:rgba(59,130,246,0.12);color:var(--info);border:1px solid rgba(59,130,246,0.3);">mcq</span>
-                <span style="font-size:13px;font-weight:700;color:var(--text);">Multiple Choice — one correct answer</span>
-                <span style="font-size:11px;color:var(--text-muted);margin-left:auto;">Default if Type column is empty</span>
-              </div>
-              <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
-                <strong style="color:var(--text);">Col6 (CorrectAnswer):</strong> Write exactly <code>A</code>, <code>B</code>, <code>C</code>, or <code>D</code> — whichever option is correct.<br>
-                <strong style="color:var(--text);">Cols 2–5 (A B C D):</strong> All four option texts. Leave C and D blank only if your question genuinely has two options.<br>
-                <strong style="color:var(--text);">Cols 9–14:</strong> Leave all blank.<br>
-                <span style="font-family:monospace;background:var(--surface);padding:3px 7px;border-radius:5px;display:inline-block;margin-top:4px;">"What is the capital of Nigeria?","Lagos","Abuja","Kano","Ibadan","B","FCT moved to Abuja in 1991.","mcq",,,,</span>
-              </div>
+          <!-- COMPACT TYPE REFERENCE LINK (full reference moved to question-types.html) -->
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(59,130,246,.06));border:1px solid rgba(139,92,246,.3);border-radius:12px;padding:14px 18px;margin-bottom:14px;">
+            <div style="flex:1;min-width:220px;">
+              <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;">📖 Question Type Reference — 20 types, one dedicated page</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.55;">Every question type, its exact columns, ready-to-copy examples, JSON rules and scoring — kept on its own page so this one stays clean. Includes mcq, mrq, tf, short, numeric, range, matching, ordering, cloze, essay, code, assertion_reason, case_study, image_mcq, matrix, hot_text, categorization, multi_numeric, hotspot and evidence_mcq.</div>
             </div>
-
-            <!-- MRQ -->
-            <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(139,92,246,0.04);">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;background:rgba(139,92,246,0.12);color:#a78bfa;border:1px solid rgba(139,92,246,0.3);">mrq</span>
-                <span style="font-size:13px;font-weight:700;color:var(--text);">Multiple Response — one or more correct answers (checkboxes)</span>
-              </div>
-              <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
-                <strong style="color:var(--text);">Col6 (CorrectAnswer):</strong> List ALL correct option letters separated by commas — e.g. <code>A,C</code> or <code>A,B,D</code>. Order does not matter.<br>
-                <strong style="color:var(--text);">Col12 (MRQ_AON):</strong> Write <code>true</code> for all-or-nothing scoring (student must get every correct option to earn any mark). Write <code>false</code> or leave blank for partial credit (student earns a fraction for each correct option chosen).<br>
-                <strong style="color:var(--text);">Cols 9–11, 13–14:</strong> Leave blank.<br>
-                <span style="font-family:monospace;background:var(--surface);padding:3px 7px;border-radius:5px;display:inline-block;margin-top:4px;">"Which are products of photosynthesis?","Glucose","Water","Oxygen","Carbon dioxide","A,C","CO₂ is consumed, not produced.","mrq",,,,false,</span>
-              </div>
-            </div>
-
-            <!-- TF -->
-            <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(245,158,11,0.04);">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;background:rgba(245,158,11,0.12);color:var(--warning);border:1px solid rgba(245,158,11,0.3);">tf</span>
-                <span style="font-size:13px;font-weight:700;color:var(--text);">True / False</span>
-              </div>
-              <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
-                <strong style="color:var(--text);">Col2 (A):</strong> The label shown on the True button — usually just write <code>True</code>.<br>
-                <strong style="color:var(--text);">Col3 (B):</strong> The label shown on the False button — usually just write <code>False</code>.<br>
-                <strong style="color:var(--text);">Cols 4–5 (C, D):</strong> Leave blank — True/False only uses A and B.<br>
-                <strong style="color:var(--text);">Col6 (CorrectAnswer):</strong> Write <code>A</code> if the statement is True, or <code>B</code> if it is False.<br>
-                <strong style="color:var(--text);">Cols 9–14:</strong> Leave all blank.<br>
-                <span style="font-family:monospace;background:var(--surface);padding:3px 7px;border-radius:5px;display:inline-block;margin-top:4px;">"Lagos is the capital of Nigeria.","True","False","","","B","The capital is Abuja since 1991.","tf",,,,</span>
-              </div>
-            </div>
-
-            <!-- SHORT -->
-            <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(16,185,129,0.04);">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;background:rgba(16,185,129,0.12);color:var(--primary);border:1px solid rgba(16,185,129,0.3);">short</span>
-                <span style="font-size:13px;font-weight:700;color:var(--text);">Short Answer / Fill-in-the-Gap — student types a word or phrase</span>
-              </div>
-              <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
-                <strong style="color:var(--text);">Cols 2–5 (A B C D):</strong> Leave all blank — Short Answer has no options.<br>
-                <strong style="color:var(--text);">Col6 (CorrectAnswer):</strong> The primary correct answer. Grading is case-insensitive exact match.<br>
-                <strong style="color:var(--text);">Col11 (Accept):</strong> Optional. Additional accepted answers separated by the pipe symbol <code>|</code>. Use this for spelling variations, abbreviations, or alternate forms — e.g. <code>H₂O|water|h2o</code>.<br>
-                <strong style="color:var(--text);">Cols 9–10, 12–14:</strong> Leave blank.<br>
-                <span style="font-family:monospace;background:var(--surface);padding:3px 7px;border-radius:5px;display:inline-block;margin-top:4px;">"The chemical symbol for water is ___","","","","","H₂O","H₂O or water are both accepted.","short",,,,"H2O|water|h₂o",</span>
-              </div>
-            </div>
-
-            <!-- NUMERIC -->
-            <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(239,68,68,0.03);">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.25);">numeric</span>
-                <span style="font-size:13px;font-weight:700;color:var(--text);">Numeric Input — student enters a number</span>
-              </div>
-              <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
-                <strong style="color:var(--text);">Cols 2–5 (A B C D):</strong> Leave all blank.<br>
-                <strong style="color:var(--text);">Col6 (CorrectAnswer):</strong> The exact correct number — e.g. <code>9.81</code> or <code>42</code>.<br>
-                <strong style="color:var(--text);">Col9 (Tolerance):</strong> Acceptable margin of error. Write <code>0</code> for exact match, or a number like <code>0.5</code> to accept answers within ±0.5 of the correct value. Leave blank for exact match.<br>
-                <strong style="color:var(--text);">Col10 (Unit):</strong> Optional display unit shown to the student — e.g. <code>m/s²</code>, <code>kg</code>, <code>°C</code>.<br>
-                <strong style="color:var(--text);">Cols 11–14:</strong> Leave blank.<br>
-                <span style="font-family:monospace;background:var(--surface);padding:3px 7px;border-radius:5px;display:inline-block;margin-top:4px;">"Calculate the acceleration due to gravity (standard value)","","","","","9.81","g = 9.81 m/s²","numeric","0.05","m/s²",,</span>
-              </div>
-            </div>
-
-            <!-- MATCHING -->
-            <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(20,184,166,0.03);">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;background:rgba(20,184,166,0.1);color:#14b8a6;border:1px solid rgba(20,184,166,0.3);">matching</span>
-                <span style="font-size:13px;font-weight:700;color:var(--text);">Matching — student pairs each left item to the correct right item</span>
-              </div>
-              <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
-                <strong style="color:var(--text);">Col1 (Question):</strong> The question instruction — e.g. <em>"Match each country to its capital city."</em><br>
-                <strong style="color:var(--text);">Cols 2–5 (A B C D):</strong> Leave all blank.<br>
-                <strong style="color:var(--text);">Col6 (CorrectAnswer):</strong> Leave blank — correctness is determined by the pairs in Col13.<br>
-                <strong style="color:var(--text);">Col13 (Pairs):</strong> The matching pairs written in JSON format. Each pair is <code>{"left":"...","right":"..."}</code> and all pairs are wrapped in a JSON array. Distractors (extra right-side options that do not match any left item) are appended as <code>{"left":"DISTRACTOR","right":"Extra wrong option"}</code> — the system recognises the keyword <code>DISTRACTOR</code> and uses only the right value as a decoy.<br>
-                <strong style="color:var(--text);">Cols 9–12, 14:</strong> Leave blank.<br>
-                <div style="font-family:monospace;background:var(--surface);padding:8px 10px;border-radius:5px;margin-top:6px;word-break:break-all;font-size:11px;">
-                  "Match each element to its symbol","","","","","","","matching","","","","","[{""left"":""Sodium"",""right"":""Na""},{""left"":""Potassium"",""right"":""K""},{""left"":""Iron"",""right"":""Fe""},{""left"":""DISTRACTOR"",""right"":""Au""}]",""
-                </div>
-                <div style="margin-top:6px;color:var(--info);">⚠️ In CSV, every double-quote inside a cell must be escaped as two double-quotes (<code>""</code>). The cell itself must be wrapped in double-quotes.</div>
-              </div>
-            </div>
-
-            <!-- ORDERING -->
-            <div style="padding:12px 16px;background:rgba(168,85,247,0.03);">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;background:rgba(168,85,247,0.1);color:#a855f7;border:1px solid rgba(168,85,247,0.3);">ordering</span>
-                <span style="font-size:13px;font-weight:700;color:var(--text);">Ordering / Sequencing — student drags items into the correct order</span>
-              </div>
-              <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
-                <strong style="color:var(--text);">Col1 (Question):</strong> The instruction — e.g. <em>"Arrange the following steps of mitosis in the correct order."</em><br>
-                <strong style="color:var(--text);">Cols 2–5 (A B C D):</strong> Leave all blank.<br>
-                <strong style="color:var(--text);">Col6 (CorrectAnswer):</strong> Leave blank — the correct order is defined by Col14.<br>
-                <strong style="color:var(--text);">Col14 (Items):</strong> All items written as a JSON array in their CORRECT order. The system automatically scrambles them for the student. Write each item as a string — e.g. <code>["Prophase","Metaphase","Anaphase","Telophase"]</code><br>
-                <strong style="color:var(--text);">Cols 9–13:</strong> Leave blank.<br>
-                <div style="font-family:monospace;background:var(--surface);padding:8px 10px;border-radius:5px;margin-top:6px;word-break:break-all;font-size:11px;">
-                  "Arrange the stages of mitosis in the correct order","","","","","","","ordering","","","","","","[""Prophase"",""Metaphase"",""Anaphase"",""Telophase""]"
-                </div>
-                <div style="margin-top:6px;color:var(--info);">⚠️ Same JSON escaping rule: double-quotes inside a CSV cell must be written as <code>""</code>.</div>
-              </div>
-            </div>
+            <a href="question-types.html" target="_blank" rel="noopener" class="btn-sm btn-primary" style="text-decoration:none;padding:10px 18px;font-size:12.5px;white-space:nowrap;">📖 Open Type Reference</a>
           </div>
 
-          <div style="border:1px solid rgba(236,72,153,0.25);border-radius:12px;overflow:hidden;margin-bottom:14px;background:rgba(236,72,153,0.03);">
-            <div style="padding:10px 14px;background:rgba(236,72,153,0.08);border-bottom:1px solid rgba(236,72,153,0.2);font-size:12px;font-weight:800;color:#ec4899;text-transform:uppercase;letter-spacing:0.4px;">Complete Question Type Reference — 17 Types, Free Rule-Based Scoring, No AI API</div>
-            <div style="padding:12px 16px;font-size:12px;color:var(--text-muted);line-height:1.85;">
-              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:10px;">
-                <div><span style="font-weight:800;color:#3b82f6;">mcq</span> — Multiple choice. Col2–5 = options, Col6 = A/B/C/D.</div>
-                <div><span style="font-weight:800;color:#f59e0b;">tf</span> — True/False. Col2=True, Col3=False, Col6=A or B.</div>
-                <div><span style="font-weight:800;color:#a78bfa;">mrq</span> — Multiple response. Col6 = sorted letters, e.g. <code>A,C</code>; Col12 controls partial/all-or-nothing.</div>
-                <div><span style="font-weight:800;color:#10b981;">short</span> — Typed answer. Col6 = primary answer; Col11 = accepted alternatives with <code>|</code>.</div>
-                <div><span style="font-weight:800;color:#ef4444;">numeric</span> — Number input. Col6 = answer, Col9 = tolerance, Col10 = unit.</div>
-                <div><span style="font-weight:800;color:#14b8a6;">matching</span> — Left/right pairs. Col13 = JSON pair array plus optional <code>DISTRACTOR</code> rows.</div>
-                <div><span style="font-weight:800;color:#a855f7;">ordering</span> — Sequencing. Col14 = JSON array in correct order.</div>
-                <div><span style="font-weight:800;color:#ec4899;">cloze</span> — Multi-blank. Question uses <code>___</code>; Col14 = JSON answer list.</div>
-                <div><span style="font-weight:800;color:#fb923c;">essay</span> — Long response. Col11/Col14 = keywords/min words; teacher review recommended.</div>
-                <div><span style="font-weight:800;color:#22c55e;">categorization</span> — Assign item to category. Col14 = <code>{"item":"...","category":"..."}</code> array.</div>
-                <div><span style="font-weight:800;color:#0ea5e9;">multi_numeric</span> — Several numeric parts. Col14 = <code>{"label":"x","answer":3,"tolerance":0}</code> array.</div>
-                <div><span style="font-weight:800;color:#f97316;">assertion_reason</span> — Assertion–Reason logic. Col6 = A/B/C/D/E; Col14 may contain assertion/reason JSON.</div>
-                <div><span style="font-weight:800;color:#84cc16;">case_study</span> — Passage/scenario MCQ. Col14 = <code>{"passage":"..."}</code>.</div>
-                <div><span style="font-weight:800;color:#06b6d4;">image_mcq</span> — Diagram/image MCQ. Col11 or Col14 may contain image path/data URI.</div>
-                <div><span style="font-weight:800;color:#eab308;">matrix</span> — Grid rows with shared choices. Col11 = choices like <code>True|False</code>; Col14 = row JSON.</div>
-                <div><span style="font-weight:800;color:#f43f5e;">hot_text</span> — Select correct words/phrases. Col14 = text chunks with <code>correct:true</code>.</div>
-                <div><span style="font-weight:800;color:#8b5cf6;">code</span> — Code/SQL/algorithm response. Col10 = language; Col11/Col14 = keywords/tests; teacher review recommended.</div>
-              </div>
-              <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;line-height:1.8;">
-                <strong style="color:var(--text);">JSON escaping rule:</strong> Whenever Col13 or Col14 contains JSON, wrap the whole CSV cell in double-quotes and write every inner double-quote as two double-quotes. Example: <code>"[{""item"":""Sodium"",""category"":""Metal""}]"</code>.<br>
-                <strong style="color:var(--text);">No AI API:</strong> Essay and code answers use transparent keyword/minimum-word/test rules and should be reviewed by the teacher for high-stakes grading.<br>
-                <strong style="color:var(--text);">Prompt help:</strong> Use <a href="PROMPT_TEMPLATE.md" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700;">PROMPT_TEMPLATE.md</a> (shipped with this platform) to ask any AI assistant to generate a ready-to-upload CSV question bank manually — or build the prompt interactively in the <a href="cbt-prompts.html" style="color:var(--primary);font-weight:700;">AI Prompts Studio</a>.
-              </div>
-            </div>
-          </div>
-
-          <input type="file" id="csv-file" accept=".csv" style="padding:10px;cursor:pointer;margin-bottom:8px;">
+<input type="file" id="csv-file" accept=".csv" style="padding:10px;cursor:pointer;margin-bottom:8px;">
           <div class="flex-gap" style="margin-bottom:8px;">
             <button type="button" class="btn-sm btn-outline" onclick="downloadQuestionTemplate()" style="width:auto;padding:7px 14px;font-size:12px;">⬇ Download CSV Template</button>
             <button type="button" class="btn-sm btn-ghost" onclick="showToast('Tip: You can also export any existing question bank as CSV from Assessments → Bank → Export CSV.')" style="width:auto;padding:7px 14px;font-size:12px;">💡 Format Tip</button>
@@ -1238,6 +1101,7 @@ code{background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px;font-
           <input type="file" id="xlsx-file" accept=".xlsx,.xls" style="padding:10px;cursor:pointer;margin-bottom:8px;">
           <div id="xlsx-preview" style="font-size:13px;color:var(--primary);margin-bottom:4px;min-height:18px;"></div>
         </div>
+        </div><!-- /panel-xlsx -->
 
         <!-- PDF PANEL -->
         <div class="input-panel" id="panel-pdf">
@@ -1367,7 +1231,6 @@ code{background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px;font-
           <button onclick="createExam()">🚀 Publish Assessment</button>
         </div>
       </div>
-    </div>
     </div><!-- /create -->
 
     <!-- ══════════ PAGE: ASSESSMENTS ══════════ -->
@@ -2473,8 +2336,8 @@ SELECT 'Run database/complete-schema.sql for the canonical HMG Academy CBT v3.1 
 
 
 <script>
-const SB_URL='https://pstnsaqjshmtintjrnas.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdG5zYXFqc2htdGludGpybmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDEzODUsImV4cCI6MjA5MTI3NzM4NX0.KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w';
+const SB_URL='__CLIENT_SUPABASE_URL__';
+const SB_KEY='__CLIENT_SUPABASE_KEY__';
 
 // ══ CONFIG — your admin email ══
 const ADMIN_EMAIL = 'buildingmyictcareer@gmail.com'; // ← YOUR ADMIN EMAIL
@@ -2757,6 +2620,30 @@ function scoreQuestion(q, sa){
     }
     if(qtype==='matching'){
         return sa?0.5:0; // accurate score from correct_count; 0.5 = attempted fallback
+    }
+    if(qtype==='range'){
+        let lo=null,hi=null;
+        if(q.items){try{const o=JSON.parse(q.items);if(o&&o.min!=null){lo=parseFloat(o.min);hi=parseFloat(o.max);}}catch(e){}}
+        if(lo===null||hi===null){
+            const m=String(q.ans||'').match(/(-?\d+(?:\.\d+)?)\s*[-\u2013\u2212]\s*(-?\d+(?:\.\d+)?)/);
+            if(m){lo=parseFloat(m[1]);hi=parseFloat(m[2]);}
+        }
+        if(lo===null||hi===null){lo=parseFloat(q.ans);hi=lo;}
+        if(lo>hi){const t=lo;lo=hi;hi=t;}
+        const v=parseFloat(sa);
+        return (!isNaN(v)&&v>=lo&&v<=hi)?1:0;
+    }
+    if(qtype==='hotspot'){
+        return String(sa||'').toUpperCase()===String(q.ans||'').toUpperCase()?1:0;
+    }
+    if(qtype==='evidence_mcq'){
+        let it={};try{it=JSON.parse(q.items||'{}');}catch(e){}
+        let st={};try{st=JSON.parse(sa||'{}');}catch(e){}
+        const a1=(it.part1&&it.part1.answer)||'';
+        const a2=(it.part2&&it.part2.answer)||'';
+        const ok1=a1&&String(st.a1||'').trim().toLowerCase()===String(a1).trim().toLowerCase();
+        const ok2=a2&&String(st.a2||'').trim().toLowerCase()===String(a2).trim().toLowerCase();
+        return (ok1&&ok2)?1:(ok1||ok2)?0.5:0;
     }
     if(qtype==='ordering'){
         const items=q.items||[];
@@ -3556,7 +3443,7 @@ function parseQuestionsCSV(text){
 
 
 
-    if(['assertion_reason','case_study','image_mcq','matrix','hot_text','code'].includes(type)){
+    if(['assertion_reason','case_study','image_mcq','matrix','hot_text','code','hotspot','evidence_mcq'].includes(type)){
       const itemsRaw=cleanField(p[13]||'');
       let items=[];
       if(itemsRaw){try{items=JSON.parse(itemsRaw);}catch(e){console.warn(type+' parse error:',e);}}
@@ -3564,7 +3451,7 @@ function parseQuestionsCSV(text){
       if(itemsRaw)q.items=items;
       const accept=cleanField(p[10]); if(accept)q.accept=accept;
       if(p[9]!==undefined){const u=cleanField(p[9]);if(u)q.unit=u;}
-      if(q.ans||type==='code'||type==='matrix'||type==='hot_text')results.push(applyQuestionMetadata(q,p));
+      if(q.ans||type==='code'||type==='matrix'||type==='hot_text'||type==='evidence_mcq'||type==='hotspot')results.push(applyQuestionMetadata(q,p));
       return;
     }
 
@@ -3637,6 +3524,7 @@ function addManualQuestion(){
           <option value="tf">⟺ True / False</option>
           <option value="short">✏ Short Answer / Fill-in-the-Gap</option>
           <option value="numeric">&#35; Numeric Input</option>
+          <option value="range">↔ Range / Estimation</option>
           <option value="matching">⇌ Matching</option>
           <option value="ordering">⇅ Ordering / Sequencing</option>
           <option value="assertion_reason">🧩 Assertion–Reason</option>
@@ -3768,6 +3656,26 @@ function onManualTypeChange(id){
       <div class="grid-2">
         <input type="text" id="mq-unit-${id}" placeholder="Unit (e.g. m/s², kg, °C) — optional">
         <input type="text" id="mq-exp-${id}" placeholder="Explanation (optional)">
+      </div>
+      <div style="display:none;">
+        <input id="mq-a-${id}" value=""><input id="mq-b-${id}" value="">
+        <input id="mq-c-${id}" value=""><input id="mq-d-${id}" value="">
+        <input id="mq-ans-${id}" value="ans_placeholder">
+      </div>`;
+    extraArea.innerHTML='';
+
+  } else if(type==='range'){
+    optArea.innerHTML=`
+      <div style="font-size:12px;color:#6366f1;margin-bottom:8px;padding:8px 12px;background:rgba(99,102,241,0.07);border-radius:8px;border:1px solid rgba(99,102,241,0.2);">
+        ↔ <strong>Range / Estimation:</strong> Any value the student types inside the interval (inclusive) earns the mark — perfect for estimation questions.
+      </div>
+      <div class="grid-2">
+        <input type="number" id="mq-range-lo-${id}" placeholder="Minimum accepted value" step="any">
+        <input type="number" id="mq-range-hi-${id}" placeholder="Maximum accepted value" step="any">
+      </div>
+      <div class="grid-2">
+        <input type="text" id="mq-exp-${id}" placeholder="Explanation (optional)">
+        <div style="font-size:11.5px;color:var(--text-muted);align-self:center;">Students see: “Enter a value between min and max.”</div>
       </div>
       <div style="display:none;">
         <input id="mq-a-${id}" value=""><input id="mq-b-${id}" value="">
@@ -4134,6 +4042,16 @@ function compileManualQuestions(){
       if(tol>0)q.tolerance=tol;
       if(unit)q.unit=unit;
       questionsPool.push(q);valid++;
+
+    } else if(type==='range'){
+      const lo=document.getElementById('mq-range-lo-'+id)?.value.trim()||'';
+      const hi=document.getElementById('mq-range-hi-'+id)?.value.trim()||'';
+      const exp=document.getElementById('mq-exp-'+id)?.value.trim()||'';
+      if(lo===''||hi==='')return;
+      const a=parseFloat(lo),b=parseFloat(hi);
+      if(isNaN(a)||isNaN(b))return;
+      const ans=(a<=b?a:b)+'-'+(a<=b?b:a);
+      questionsPool.push({q:qText,a:'',b:'',c:'',d:'',ans,exp,type:'range'});valid++;
 
     } else if(type==='matching'){
       const pairRows=[...document.querySelectorAll('#mq-pairs-list-'+id+' > div')];
@@ -4863,9 +4781,12 @@ function downloadQuestionTemplate(){
     '"Classify each statement as True or False.","","","","","","Each row is scored separately.","matrix","","","True|False","","","[{""statement"":""Water boils at 100°C at sea level."",""answer"":""True""},{""statement"":""CO₂ is oxygen gas."",""answer"":""False""}]","medium","science|matrix","General Science"',
     '"Select the prime numbers.","","","","","","2 and 5 are prime; 4 is composite.","hot_text","","","","","","[{""text"":""2"",""correct"":true},{""text"":""4"",""correct"":false},{""text"":""5"",""correct"":true}]","easy","math|prime numbers","Number Theory"',
     '"Write a JavaScript function that returns the larger of two numbers.","","","","","","Keyword/test scoring is automatic; teacher review is recommended for final code quality.","code","","JavaScript","function|return|Math.max|if","","","{""language"":""JavaScript"",""keywords"":[""function"",""return"",""Math.max""]}","challenging","coding|algorithm","Programming"'
-  ].join('\n');
-  _downloadTextFile('hmg_cbt_question_template_v3_17_types.csv','\uFEFF'+csv,'text/csv;charset=utf-8;');
-  showToast('✅ Question CSV template downloaded (17 question types).');
+  ,
+    '"Estimate the boiling point of water on Mount Everest (°C).","","","","","70-90","At altitude the boiling point drops; 70-90 °C is accepted.","range","","","","","","","medium","physics|estimation","Heat"',
+    '"Tap the cell organelle that stores water.","","","","","","Central vacuole","The large central vacuole stores water in plant cells.","hotspot","","","","","","{""image"":""assets/sample-cell-diagram.png"",""regions"":[{""label"":""Nucleus"",""x"":50,""y"":30},{""label"":""Central vacuole"",""x"":50,""y"":65},{""label"":""Mitochondrion"",""x"":25,""y"":50}]}","medium","biology|diagram","Cells"',
+    '"(Part A) Main idea of the passage? (Part B) Which sentence proves it?","","","","","","","Part A tests the main idea; Part B tests evidence. Both parts right = full mark; one = half.","evidence_mcq","","","","","","{""part1"":{""question"":""What is the main idea of the passage?"",""options"":[""Plants need light"",""Plants make food"",""Plants grow in soil"",""Plants need water""],""answer"":""Plants make food""},""part2"":{""question"":""Which sentence best supports your answer?"",""options"":[""Leaves are green"",""Plants use sunlight to build sugar"",""Roots take in water"",""Soil holds the plant""],""answer"":""Plants use sunlight to build sugar""}}","challenging","reading|evidence","Comprehension"'].join('\n');
+  _downloadTextFile('hmg_cbt_question_template_v3_20_types.csv','\uFEFF'+csv,'text/csv;charset=utf-8;');
+  showToast('✅ Question CSV template downloaded (20 question types).');
 }
 function downloadStudentTemplate(){
   const csv='FullName,StudentID,Class\nADEWALE SAMSON,SS/2026/001,SSS2A\nFATIMA IBRAHIM,SS/2026/002,SSS2A\nCHUKWUEMEKA OBI,SS/2026/003,SSS2B';

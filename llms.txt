@@ -17,8 +17,8 @@ How it works (4 steps, all in the browser):
 What the generated client package contains (from templates/):
 - 3-portal CBT system: candidate exam portal, teacher login hub, admin login console
 - Multi-subject UTME/JAMB tabbed exams with per-subject scoring
-- AI Prompts Studio: 18 prompt packs + full copy-paste library (free AI chats, no AI API)
-- 18 question types, proctoring and anti-cheat, verifiable certificates
+- AI Prompts Studio: 24 prompt packs + full copy-paste library (free AI chats, no AI API)
+- 20 question types, proctoring and anti-cheat, verifiable certificates
 - Governance suite: backups, Google Drive sync, disaster recovery, storage manager, platform health, roles & approvals, audit trail
 - database/ folder: complete-schema.sql is the single all-inclusive idempotent run-once setup file, plus optional maintenance extracts and sample CSVs
 - 1,000-student submission resilience: jitter, exponential-backoff retries, offline auto-flush queue

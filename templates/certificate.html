@@ -5,8 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Verify HMG Academy CBT Pro student certificates and result verification codes.">
 <meta name="robots" content="index, follow">
+<link rel="canonical" href="__CLIENT_SITE_URL__/certificate.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HMG Academy CBT Pro">
+<meta property="og:title" content="HMG Academy CBT Pro — Certificate Verification">
+<meta property="og:description" content="Verify any HMG Academy CBT Pro result certificate by its verification code — employers and parents can confirm results in seconds.">
+<meta property="og:url" content="__CLIENT_SITE_URL__/certificate.html">
+<meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#10b981">
-<title>HMG Academy CBT | Certificate Verification</title>
+<title>HMG Academy CBT Pro | Certificate &amp; Result Verification</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -92,8 +99,8 @@ button:hover{opacity:0.9;}
 </div>
 
 <script>
-const SB_URL='https://pstnsaqjshmtintjrnas.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdG5zYXFqc2htdGludGpybmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDEzODUsImV4cCI6MjA5MTI3NzM4NX0.KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w';
+const SB_URL='__CLIENT_SUPABASE_URL__';
+const SB_KEY='__CLIENT_SUPABASE_KEY__';
 
 async function verifyCertificate() {
   const code = document.getElementById('cert-code-input').value.trim();

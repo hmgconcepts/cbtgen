@@ -288,8 +288,8 @@ The system supports MCQ, MRQ, True/False, Short Answer, Numeric, Matching, Order
 - Admin can open/lock exams and clear an exam’s result records from the platform-wide exam page.
 ## CBT v3 documentation and authoring upgrades
 
-- Teacher Dashboard now documents all 17 question types directly in the Question Bank section.
-- Downloadable CSV question template includes example rows for all 17 question types.
+- Teacher Dashboard links to the dedicated Question Types Reference page (question-types.html) documenting all 20 question types.
+- Downloadable CSV question template includes example rows for all 20 question types (including range, hotspot and evidence_mcq).
 - `PROMPT_TEMPLATE.md` now contains ready-to-copy prompts that teachers can give to an AI assistant to generate HMG CBT-compatible CSV question banks manually.
 - The prompt template includes strict CSV header, CSV escaping rules, distribution guidance, type-specific column rules, quality rules, and no-paid-API reminders.
 ## SEO/PWA/Lead generation

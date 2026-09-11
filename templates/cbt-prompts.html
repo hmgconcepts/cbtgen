@@ -42,7 +42,7 @@
   <div class="card-title-row">
     <div>
       <h1>🤖 AI Question Prompts Studio</h1>
-      <p>Compose a fully-structured, strict CSV/JSON question-bank prompt and paste it into <b>any free AI chat</b> (ChatGPT, Claude, Gemini, DeepSeek) — no paid AI APIs anywhere in this platform. 18 tailored packs · 18 question types · one import-safe output contract.</p>
+      <p>Compose a fully-structured, strict CSV/JSON question-bank prompt and paste it into <b>any free AI chat</b> (ChatGPT, Claude, Gemini, DeepSeek) — no paid AI APIs anywhere in this platform. 24 tailored packs · 20 question types · one import-safe output contract.</p>
     </div>
   </div>
 
@@ -394,7 +394,7 @@ STRICT RULES
         <tr><td>2–5</td><td><span class="code-chip">A B C D</span></td><td>Options. C/D empty for True/False.</td><td>mcq, multi_select, true_false</td></tr>
         <tr><td>6</td><td><span class="code-chip">CorrectAnswer</span></td><td>A/B/C/D · "A,C" for multi-select · numeric value · "True"/"False" · exact short text · "essay".</td><td>All objective types</td></tr>
         <tr><td>7</td><td><span class="code-chip">Explanation</span></td><td>The 4-move marking scheme: verdict in words → numbered reasoning → misconceptions → takeaway.</td><td>All types (never empty)</td></tr>
-        <tr><td>8</td><td><span class="code-chip">Type</span></td><td>One of the 18 types (see table below).</td><td>All</td></tr>
+        <tr><td>8</td><td><span class="code-chip">Type</span></td><td>One of the 20 types (see table below).</td><td>All</td></tr>
         <tr><td>9</td><td><span class="code-chip">Tolerance</span></td><td>Numeric marking margin, e.g. 0.05.</td><td>numeric, multi_numeric</td></tr>
         <tr><td>10</td><td><span class="code-chip">Unit</span></td><td>Unit symbol shown to the candidate (m/s, kg, ₦, °C).</td><td>numeric</td></tr>
         <tr><td>11</td><td><span class="code-chip">Accept</span></td><td>Pipe-separated accepted synonyms for short answers.</td><td>short_answer</td></tr>
@@ -410,7 +410,8 @@ STRICT RULES
 
   <!-- THE 18 TYPES -->
   <div class="card">
-    <h2>🧩 The 18 question types this platform marks</h2>
+    <h2>🧩 The 20 question types this platform marks</h2>
+    <p style="color:var(--text-muted);font-size:.8rem;margin:0 0 10px;">Full reference with copy-paste examples for every type: <a href="question-types.html" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700;">📖 Question Type Reference</a>.</p>
     <div class="table-wrap">
       <table class="contract-table">
         <tr><th>Type (Col8)</th><th>Candidate interaction</th><th>Type (Col8)</th><th>Candidate interaction</th></tr>
@@ -420,6 +421,7 @@ STRICT RULES
         <tr><td><span class="code-chip">short_answer</span></td><td>Type the exact answer (synonyms accepted)</td><td><span class="code-chip">matrix</span></td><td>Fill a Yes/No grid</td></tr>
         <tr><td><span class="code-chip">numeric</span></td><td>Type a number (± tolerance, with unit)</td><td><span class="code-chip">hot_text</span></td><td>Tap the correct words in a sentence</td></tr>
         <tr><td><span class="code-chip">multi_numeric</span></td><td>Multi-part numeric answers</td><td><span class="code-chip">assertion_reason</span></td><td>Assertion &amp; Reason judgement</td></tr>
+        <tr><td><span class="code-chip">range</span></td><td>Any value inside an accepted interval</td><td><span class="code-chip">evidence_mcq</span></td><td>Two-part: answer, then the evidence for it</td></tr>
         <tr><td><span class="code-chip">cloze</span></td><td>Fill numbered gaps {{1}} {{2}}</td><td><span class="code-chip">case_study</span></td><td>Passage-pinned questions</td></tr>
         <tr><td><span class="code-chip">image_based</span></td><td>Question with an image/diagram</td><td><span class="code-chip">hotspot</span></td><td>Click labelled points on a diagram</td></tr>
         <tr><td><span class="code-chip">essay</span></td><td>Long-form answer with word limits</td><td><span class="code-chip">code</span></td><td>Code / SQL output or solution</td></tr>

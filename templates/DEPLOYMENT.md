@@ -366,7 +366,7 @@ The platform deliberately avoids AI API calls because paid APIs are not cost-eff
 
 ## CBT v3 note
 
-Before deployment, run `database/complete-schema.sql`, then upload all static files. CBT v3 includes a rewritten `PROMPT_TEMPLATE.md` for manual AI-assisted CSV question generation, a Teacher Dashboard reference for all 17 question types, and a downloadable CSV template with all 17 type examples. No runtime AI API is used.
+Before deployment, run `database/complete-schema.sql`, then upload all static files. CBT v3 includes a rewritten `PROMPT_TEMPLATE.md` for manual AI-assisted CSV question generation, the dedicated question-types.html reference for all 20 question types, and a downloadable CSV template with all 20 type examples. No runtime AI API is used.
 ## Search engine and PWA deployment checks
 
 After deployment, verify `/robots.txt`, `/sitemap.xml`, `/manifest.webmanifest`, and `/sw.js` load publicly. Submit the sitemap URL to Google Search Console and Bing Webmaster Tools. Test PWA installation on Android Chrome, iPhone Safari, and desktop Chrome/Edge.
@@ -438,3 +438,29 @@ Upload any question CSV — HMG 17-column, School Connect, or GOSA Portal format
 ### 16.3 Tutor review workflow (no setup needed)
 
 Scripts with essay / code / short-answer / case-study questions are auto-flagged into the Teacher Hub **🧑‍⚖️ Review Queue**. Audit them with the marking-scheme panel; scores revise and audit-log automatically.
+
+## 6. Make the platform searchable (Google, Bing, Yahoo)
+
+The package ships with production-grade SEO: a `sitemap.xml`, a `robots.txt`,
+canonical URLs, Open Graph / Twitter social-share tags and JSON-LD structured
+data on every public page.
+
+1. **If you entered a Deployment URL in the generator** — everything already
+   points at your live address. Nothing to change.
+2. **If you left it blank** — after deploying, open `robots.txt` and
+   `sitemap.xml` and replace `https://YOUR-DEPLOYMENT-URL` with your live
+   address (e.g. `https://my-school.vercel.app`). The HTML pages use
+   domain-agnostic relative URLs, so they need no edits on any domain.
+3. **Claim and submit** (free, ~10 minutes, one-time):
+   - Google: [Search Console](https://search.google.com/search-console) →
+     add property → submit `sitemap.xml`.
+   - Bing **and** Yahoo: [Bing Webmaster Tools](https://www.bing.com/webmasters)
+     → import from Google Search Console or submit the sitemap directly
+     (Bing powers Yahoo search).
+   - DuckDuckGo indexes automatically — no submission needed.
+4. Results typically appear within days; exam codes and certificate
+   verification pages then surface when people search your school's name.
+
+> Internal staff tools (admin, data, storage, health, roles, settings, audit)
+> are intentionally excluded from the sitemap — they sit behind logins and
+> should not appear in search results.

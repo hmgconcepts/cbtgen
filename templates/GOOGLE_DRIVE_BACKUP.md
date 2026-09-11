@@ -52,7 +52,7 @@ Still in **Settings → Google Drive Cloud Sync**:
 
 | Item | Included |
 |---|---|
-| Exams | ✅ every exam + its full question bank (all 17 types) |
+| Exams | ✅ every exam + its full question bank (all 20 types) |
 | Students | ✅ rosters per teacher |
 | Results | ✅ every candidate submission: answers, scores, times, integrity logs |
 | Settings | ✅ platform settings (branding, defaults, accessibility, security) |

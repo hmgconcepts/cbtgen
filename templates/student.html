@@ -3,7 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>HMG Academy CBT | Student Portal</title>
+    <title>HMG Academy CBT Pro | Student Exam Portal — Take Your CBT Online</title>
+    <meta name="description" content="Student exam portal of HMG Academy CBT Pro. Enter your exam link or 6-character code to take a proctored online CBT with timer, question navigator, scientific calculator and maths keyboard — free, no account needed.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="__CLIENT_SITE_URL__/student.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="HMG Academy CBT Pro">
+    <meta property="og:title" content="HMG Academy CBT Pro — Student Exam Portal">
+    <meta property="og:description" content="Take your proctored online CBT: exam link or code, timer, navigator, calculator and instant results. Free platform by HMG Concepts.">
+    <meta property="og:url" content="__CLIENT_SITE_URL__/student.html">
+    <meta name="twitter:card" content="summary">
     <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -967,8 +976,8 @@
 </div>
 
 <script>
-const SB_URL='https://pstnsaqjshmtintjrnas.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdG5zYXFqc2htdGludGpybmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDEzODUsImV4cCI6MjA5MTI3NzM4NX0.KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w';
+const SB_URL='__CLIENT_SUPABASE_URL__';
+const SB_KEY='__CLIENT_SUPABASE_KEY__';
 
 // ═══ EXAM STATE ═══
 let exam=null, questions=[], current=0, answers={};
@@ -1988,6 +1997,12 @@ function showQ(prevIndex){
         _renderMatrix(q, origKey, box);
     } else if(qtype==='hot_text'){
         _renderHotText(q, origKey, box);
+    } else if(qtype==='range'){
+        _renderRange(q, origKey, box);
+    } else if(qtype==='hotspot'){
+        _renderHotspot(q, origKey, box);
+    } else if(qtype==='evidence_mcq'){
+        _renderEvidenceMCQ(q, origKey, box);
     } else if(qtype==='code'){
         _renderCodeAnswer(q, origKey, box);
     } else {
@@ -2051,6 +2066,104 @@ function _renderTF(q, origKey, box){
 
     grid.appendChild(tDiv); grid.appendChild(fDiv);
     box.appendChild(grid);
+}
+
+function _renderRange(q, origKey, box){
+    /* RANGE — estimation questions: any value inside [min, max] earns the mark. */
+    const wrap=document.createElement('div');
+    const stored=answers[isMultiSubjectMode ? (activeSubjectIdx + '_' + origKey) : origKey]||'';
+    const b=_rangeBounds(q);
+    wrap.innerHTML=`
+      <input type="number" step="any" class="short-answer-input" id="range-input-${origKey}"
+        placeholder="Enter a value between ${b.lo} and ${b.hi}" value="${escapeHtmlStudent(stored)}" autocomplete="off">
+      <p class="short-answer-hint">💡 Any value from <strong>${b.lo}</strong> to <strong>${b.hi}</strong> (inclusive) is marked correct.</p>`;
+    box.appendChild(wrap);
+    requestAnimationFrame(()=>{
+        const inp=document.getElementById('range-input-'+origKey);
+        if(inp)inp.addEventListener('input',()=>{ answers[isMultiSubjectMode ? (activeSubjectIdx + '_' + origKey) : origKey]=inp.value; });
+    });
+}
+
+function _rangeBounds(q){
+    let lo=null,hi=null;
+    if(q.items){ try{ const o=JSON.parse(q.items); if(o&&o.min!=null){lo=parseFloat(o.min);hi=parseFloat(o.max);} }catch(e){} }
+    if(lo==null||hi==null){
+        const m=String(q.ans||'').match(/(-?\d+(?:\.\d+)?)\s*[-\u2013\u2212]\s*(-?\d+(?:\.\d+)?)/);
+        if(m){lo=parseFloat(m[1]);hi=parseFloat(m[2]);}
+    }
+    if(lo==null||hi==null){lo=parseFloat(q.ans);hi=lo;}
+    if(lo>hi){const t=lo;lo=hi;hi=t;}
+    return {lo,hi};
+}
+
+function _renderHotspot(q, origKey, box){
+    /* HOTSPOT — tap the right region on a diagram. Degrades to labelled buttons
+       when the image cannot load, so the question is never unanswerable. */
+    let it={}; try{ it=JSON.parse(q.items||'{}'); }catch(e){}
+    const img=q.media_url||it.image||'';
+    const regions=Array.isArray(it.regions)?it.regions:[];
+    const key=()=> isMultiSubjectMode ? (activeSubjectIdx + '_' + origKey) : origKey;
+    const wrap=document.createElement('div');
+    if(img){
+        wrap.innerHTML=`<div style="position:relative;width:100%;max-width:640px;margin:0 auto 10px;">
+          <img src="${escapeHtmlStudent(img)}" alt="Hotspot diagram" loading="lazy"
+               onerror="this.style.display='none';document.getElementById('hs-fb-${origKey}').style.display='block';"
+               style="width:100%;border-radius:10px;border:1px solid var(--border);">
+        </div>
+        <div id="hs-fb-${origKey}" style="display:none;padding:10px;background:var(--bg);border:1px dashed var(--border);border-radius:10px;margin-bottom:10px;font-size:12.5px;color:var(--text-muted);">⚠️ The diagram could not load — answer with the labelled buttons below.</div>`;
+        box.appendChild(wrap);
+        const holder=wrap.firstElementChild;
+        regions.forEach((r,i)=>{
+            const btn=document.createElement('button');
+            btn.type='button';
+            btn.setAttribute('aria-label', r.label!=null?String(r.label):('region '+(i+1)));
+            btn.style.cssText=`position:absolute;left:${(Number(r.x)||0)*100}%;top:${(Number(r.y)||0)*100}%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:rgba(217,119,6,.35);border:2px solid #d97706;cursor:pointer;`;
+            btn.onclick=()=>{ answers[key()]=String(r.label!=null?r.label:i); showQ(); renderQNav(); };
+            holder.appendChild(btn);
+        });
+    }
+    if(regions.length){
+        const list=document.createElement('div');
+        list.className='mrq-list'; list.style.cssText='display:flex;flex-wrap:wrap;gap:8px;';
+        regions.forEach((r,i)=>{
+            const label=String(r.label!=null?r.label:i);
+            const b=document.createElement('button');
+            b.type='button';
+            b.className='opt';
+            b.style.cssText='width:auto;padding:9px 16px;font-size:13px;';
+            b.textContent=(img?'📍 ':'')+label;
+            b.onclick=()=>{ answers[key()]=label; showQ(); renderQNav(); };
+            list.appendChild(b);
+        });
+        box.appendChild(list);
+    } else {
+        box.innerHTML+='<p style="color:var(--danger);">⚠️ No hotspot regions defined.</p>';
+    }
+}
+
+function _renderEvidenceMCQ(q, origKey, box){
+    /* EVIDENCE-BASED MCQ — two linked parts: the answer, then the evidence for it. */
+    let it={}; try{ it=JSON.parse(q.items||'{}'); }catch(e){}
+    const p1=it.part1||{question:'Part A',options:[]};
+    const p2=it.part2||{question:'Part B: Which choice provides the best evidence for the answer to Part A?',options:[]};
+    const key=()=> isMultiSubjectMode ? (activeSubjectIdx + '_' + origKey) : origKey;
+    const stored=(()=>{ try{ return JSON.parse(answers[key()]||'{}'); }catch(e){ return {}; } })();
+    [ [p1,'a1','Part A'], [p2,'a2','Part B'] ].forEach(([part,slot,title],idx)=>{
+        const sec=document.createElement('div');
+        sec.style.cssText=idx?'margin-top:16px;border-top:1px solid var(--border);padding-top:14px;':'';
+        sec.innerHTML=`<div style="font-size:13px;font-weight:800;margin-bottom:9px;color:var(--text);">${escapeHtmlStudent(title)} — ${escapeHtmlStudent(part.question||'')}</div>`;
+        (part.options||[]).forEach(opt=>{
+            const b=document.createElement('button');
+            b.type='button';
+            b.className='opt'+(stored[slot]===opt?' selected':'');
+            b.style.cssText='text-align:left;';
+            b.textContent=opt;
+            b.onclick=()=>{ const cur=(()=>{ try{ return JSON.parse(answers[key()]||'{}'); }catch(e){ return {}; } })();
+                cur[slot]=opt; answers[key()]=JSON.stringify(cur); showQ(); renderQNav(); };
+            sec.appendChild(b);
+        });
+        box.appendChild(sec);
+    });
 }
 
 function _renderShort(q, origKey, box){
@@ -2587,8 +2700,24 @@ async function submitExam(){
             if(!isNaN(studentVal)&&!isNaN(correctVal)&&Math.abs(studentVal-correctVal)<=Math.abs(tol)){score++;correct++;}
             else{wrong++;}
 
-        } else if(qtype==='assertion_reason'||qtype==='case_study'||qtype==='image_mcq'){
+        } else if(qtype==='assertion_reason'||qtype==='case_study'||qtype==='image_mcq'||qtype==='hotspot'){
             if(String(sa||'').toUpperCase()===String(q.ans||'').toUpperCase()){score++;correct++;}else{wrong++;}
+
+        } else if(qtype==='range'){
+            const b=_rangeBounds(q);
+            const v=parseFloat(sa);
+            if(!isNaN(v)&&v>=b.lo&&v<=b.hi){score++;correct++;}else{wrong++;}
+
+        } else if(qtype==='evidence_mcq'){
+            let it={}; try{ it=JSON.parse(q.items||'{}'); }catch(e){}
+            let st={}; try{ st=JSON.parse(sa||'{}'); }catch(e){}
+            const a1=(it.part1&&it.part1.answer)||'';
+            const a2=(it.part2&&it.part2.answer)||'';
+            const ok1=a1&&String(st.a1||'').trim().toLowerCase()===String(a1).trim().toLowerCase();
+            const ok2=a2&&String(st.a2||'').trim().toLowerCase()===String(a2).trim().toLowerCase();
+            if(ok1&&ok2){score++;correct++;}
+            else if(ok1||ok2){score+=0.5;wrong++;}
+            else{wrong++;}
 
         } else if(qtype==='matrix'){
             const rows=_safeItems(q);let obj={};try{obj=JSON.parse(sa||'{}');}catch(e){}

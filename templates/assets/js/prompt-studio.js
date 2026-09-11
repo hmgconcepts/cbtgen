@@ -8,12 +8,12 @@
    file that imports directly into the Teacher Hub question bank.
 
    ORGANIZATION (mirrors the School Connect Prompt Studio, adapted and
-   extended for this platform's 18 question types):
+   extended for this platform's 20 question types):
      • HEADER               — the one and only CSV contract (17 columns)
      • EXPLANATION_STANDARD — the universal 4-move marking-scheme rule
                               injected into EVERY generated prompt
      • RULES                — per-question-type column rules
-     • PACKS                — 18 tailored packs; each is a DIFFERENT
+     • PACKS                — 24 tailored packs; each is a DIFFERENT
                               prompt: its own role, mission, scaled type
                               distribution, briefing sections, quality bar
                               and final checklist. Only the CSV OUTPUT
@@ -27,7 +27,7 @@
                               (source material, subject list, board…)
      • STATIC               — one-click classic prompts (quick cards)
 
-   The 18 supported question types (matching assets/js/cbt-types.js):
+   The 20 supported question types (matching assets/js/cbt-types.js):
      mcq, multi_select, true_false, short_answer, numeric, multi_numeric,
      cloze, matching, ordering, categorization, matrix, hot_text,
      assertion_reason, case_study, image_based, hotspot, essay, code
@@ -42,7 +42,7 @@ const PromptStudio = {
     '  "A": "option A", "B": "option B", "C": "…", "D": "…",',
     '  "CorrectAnswer": "C"  | "A,C" (multi_select) | "42.5" (numeric) | "True" | "short exact text" | "essay" ,',
     '  "Explanation": "marking-scheme explanation (4 moves, see standard)",',
-    '  "Type": "one of the 18 types",',
+    '  "Type": "one of the 20 types",',
     '  "Tolerance": "0.05", "Unit": "m/s", "Accept": "synonym1|synonym2",',
     '  "MRQ_AON": "false",',
     '  "Pairs": "[{\\"l\\":\\"left\\",\\"r\\":\\"right\\"}]",',
@@ -187,6 +187,22 @@ const PromptStudio = {
       '    or {"image_text":"ASCII/text diagram"}. The platform renders the\n' +
       '    image above the question. Public https links only.',
 
+    range: 'RANGE / ESTIMATION (Col8 "range")\n' +
+      '  • Col6: the accepted interval as min-max, e.g. 15-25.\n' +
+      '  • Any value inside the interval (inclusive) earns the mark — ideal for\n' +
+      '    estimation questions where several answers are defensible.\n' +
+      '  • Alternatively Col14 Items: {"min":15,"max":25}.\n' +
+      '  • The question text should make the expected precision clear ("to the\n' +
+      '    nearest ten", "within 5%").',
+
+    evidence_mcq: 'EVIDENCE-BASED MCQ (Col8 "evidence_mcq")\n' +
+      '  • Col14 Items: {"part1":{"question":"...","options":["...","...","...","..."],' +
+      '"answer":"exact option text"},"part2":{"question":"Which choice provides the best ' +
+      'evidence for the answer to Part A?","options":[...],"answer":"exact option text"}}\n' +
+      '  • Part B options must be quotable lines from the passage/material.\n' +
+      '  • Both parts right = full mark; one part right = half mark.\n' +
+      '  • Cols 2-5 stay empty for this type — the options live in the JSON.',
+
     hotspot: 'HOTSPOT / LABEL THE DIAGRAM (Col8 "hotspot")\n' +
       '  • Col14 (Items): JSON {"image":"https://…",\n' +
       '    "targets":[{"label":"A","x":20,"y":35},{"label":"B","x":60,"y":70}]}\n' +
@@ -209,7 +225,7 @@ const PromptStudio = {
   },
 
   /* =====================================================================
-     THE PACK LIBRARY — 18 tailored packs.
+     THE PACK LIBRARY — 24 tailored packs.
      ref = reference type distribution scaled to the requested count.
      ===================================================================== */
   PACKS: {
@@ -265,12 +281,12 @@ const PromptStudio = {
     },
 
     enterprise: {
-      label: 'ENTERPRISE CBT PRO — all 18 question types',
+      label: 'ENTERPRISE CBT PRO — all 20 question types',
       role: 'the chief examiner of an enterprise computer-based testing programme, fluent in every modern CBT item format',
       mission: 'Produce a showcase paper that exercises EVERY interaction format this platform supports, so stakeholders see the full engine on one paper.',
-      ref: { mcq: 8, multi_select: 4, true_false: 3, short_answer: 3, numeric: 3, multi_numeric: 2, cloze: 2, matching: 2, ordering: 2, categorization: 2, matrix: 1, hot_text: 1, assertion_reason: 2, case_study: 2, image_based: 1, hotspot: 1, essay: 1, code: 1 }, dominant: 'mcq', minOne: true,
+      ref: { mcq: 6, multi_select: 3, true_false: 3, short_answer: 3, numeric: 3, range: 2, multi_numeric: 2, cloze: 2, matching: 2, ordering: 2, categorization: 2, matrix: 1, hot_text: 1, assertion_reason: 2, case_study: 2, image_based: 1, hotspot: 1, evidence_mcq: 1, essay: 1, code: 1 }, dominant: 'mcq', minOne: true,
       sections: [
-        ['FORMAT TOUR', 'Every one of the 18 types appears at least once (the distribution below\nis scaled to the requested count and guarantees this when count ≥ 18).'],
+        ['FORMAT TOUR', 'Every one of the 20 types appears at least once (the distribution below\nis scaled to the requested count and guarantees this when count ≥ 20).'],
         ['JSON CELLS', 'Cols 13/14 carry JSON. In CSV every inner double quote is doubled ("")\nand the whole cell is wrapped in double quotes. Test one cell mentally\nbefore writing the file.']
       ],
       quality: [
@@ -278,6 +294,113 @@ const PromptStudio = {
         'Each type is used where it is the BEST format for that content, not for variety alone.',
         'Image questions use public https links or clean ASCII diagrams.',
         'The essay item carries a full model answer in Col7.'
+      ]
+    },
+
+    auto_graded: {
+      label: '🎯 Auto-Graded Ultimate Pack (every auto-marked type)',
+      role: 'an assessment architect building a reference paper that demonstrates ALL auto-graded question formats this platform supports',
+      mission: 'Exercise the FULL range of auto-graded question types with 100% automated scoring. Do NOT use any type that needs teacher review (no essay, no code, no file uploads). Every mark on this paper is awarded by the engine the moment the candidate submits.',
+      ref: { mcq: 3, true_false: 2, multi_select: 2, short_answer: 2, numeric: 2, range: 2, multi_numeric: 2, cloze: 2, matching: 2, ordering: 2, categorization: 2, matrix: 2, hot_text: 2, assertion_reason: 2, case_study: 2, image_based: 2, hotspot: 2, evidence_mcq: 2 },
+      dominant: 'mcq', minOne: true,
+      sections: [
+        ['COVERAGE — EVERY AUTO-GRADED TYPE MUST SURVIVE', 'The distribution below guarantees at least one item of every auto-graded\ntype even at small counts. Strictly EXCLUDE essay, code and any manual-\nreview type. Do not silently drop a type because it is harder to write.'],
+        ['SELF-DOCUMENTING', 'Because teachers read this paper to learn the formats, each Explanation\nshould also note in one clause why that TYPE suited that question.'],
+        ['JSON CELLS', 'Structured types live in Col13 (Pairs) and Col14 (Items) as JSON with every\ninner double quote doubled (\"). One malformed JSON cell breaks the import\nof the whole row — validate each one mentally before moving on.']
+      ],
+      quality: [
+        'All 18 auto-graded types present; strictly NO essay, NO code, NO manual-review types.',
+        'Every JSON cell parses after un-doubling the quotes.',
+        'Partial-credit types (matching, ordering, cloze, matrix, multi_numeric) have at least 3 rows/parts each so partial credit is meaningful.',
+        'The paper still reads as a coherent assessment, not a format catalogue.'
+      ]
+    },
+
+    material_upload: {
+      label: '📄 Uploaded Material CBT (paste/attach a document)',
+      role: 'an expert professional, seasoned educator and experienced world-class examiner creating a rigorous auto-graded assessment strictly from the provided document material',
+      mission: 'Generate a comprehensive CBT strictly based on the material the teacher pastes or attaches into the chat. ONLY use facts found in the document — no external knowledge. Exclude any type requiring teacher review (no essay). Prepare students to local, national and international examination standards.',
+      ref: { mcq: 5, true_false: 2, multi_select: 2, short_answer: 2, numeric: 2, matching: 2, ordering: 2, cloze: 2, categorization: 2, matrix: 2, hot_text: 2, assertion_reason: 2, case_study: 2 },
+      dominant: 'mcq',
+      sections: [
+        ['SOURCE ADHERENCE', 'Every single question MUST be derivable directly from the uploaded/pasted\nmaterial. No hallucinated facts, no outside syllabus content. If the\nmaterial does not support the requested count, say so and produce fewer\nrather than inventing.'],
+        ['TARGETED EXTRACTION', 'Focus entirely on the pages, chapters or sections the teacher names:\n{{SOURCE}}'],
+        ['EXAMINATION RIGOR', 'Design questions that test critical thinking, analysis and application of\nthe text — not just line-by-line recall — matching world-class standards.']
+      ],
+      quality: [
+        'No hallucinated information; every answer is verifiable against the text.',
+        'Strictly auto-graded types only.',
+        'Question difficulty spans recall, application and analysis of the material.'
+      ]
+    },
+
+    material_link: {
+      label: '🔗 Linked Material CBT (questions strictly from a URL)',
+      role: 'an expert professional, seasoned educator and experienced world-class examiner creating a rigorous auto-graded assessment strictly from the material at the provided link(s)',
+      mission: 'Analyse the material at the provided URL(s) and generate a comprehensive CBT strictly based on it. ONLY use facts found in the linked material. Exclude any type requiring teacher review. If you cannot open links, say so in ONE line and ask the teacher to paste the text, then continue from the pasted text.',
+      ref: { mcq: 5, true_false: 2, multi_select: 2, short_answer: 2, numeric: 2, matching: 2, ordering: 2, cloze: 2, categorization: 2, matrix: 2, hot_text: 2, assertion_reason: 2, case_study: 2 },
+      dominant: 'mcq',
+      sections: [
+        ['THE LINKED MATERIAL', 'The material is at this link (public https / Drive / web):\n{{SOURCE}}\nThis platform stores LINKS ONLY — never uploads — to protect free quotas.'],
+        ['SOURCE ADHERENCE', 'Every single question MUST be derivable directly from the linked material.\nNo external facts. Reference specific sections, figures and arguments FROM\nthe material so only a student who read it can answer.'],
+        ['EXAMINATION RIGOR', 'Design questions that test critical thinking, analysis and application of\nthe text, matching world-class standards.']
+      ],
+      quality: [
+        'No hallucinated information; stick perfectly to the linked text.',
+        'Strictly auto-graded types only.',
+        'Every item cites something specific in the linked material.'
+      ]
+    },
+
+    dl_article: {
+      label: '📚 Reading Comprehension — article / material link',
+      role: 'a reading-comprehension specialist preparing a linked-article assignment: the reading link plus the comprehension quiz that proves it was read',
+      mission: 'The student opens the LINK the teacher shares, reads the article, then answers the quiz. Every question must be answerable ONLY by someone who actually engaged with the linked material — not from general knowledge.',
+      ref: { mcq: 10, true_false: 3, short_answer: 3, cloze: 2, essay: 2 }, dominant: 'mcq',
+      sections: [
+        ['THE LINKED MATERIAL', 'The reading is at this link (article / Drive material):\n{{SOURCE}}\nThis platform stores LINKS ONLY — never uploads. If you cannot open\nlinks, say so in ONE line and ask the teacher to paste the text; then\ncontinue from the pasted text.'],
+        ['QUESTIONS MUST PROVE READING', 'Reference specific sections, figures, arguments and examples FROM the\nmaterial ("According to the third paragraph...", "The author\'s example of\n..."). A student who has not opened the link should not be able to guess.'],
+        ['TEACHER SETUP NOTE (include as a comment in Col7 of row 1)', 'Remind the teacher: share the same link with students (assignment\ninstructions or the exam\'s intro text), then import this CSV on the\nTeacher Hub — Create Assessment → upload CSV — so the quiz marks itself\nand feeds the results report.']
+      ],
+      quality: [
+        'Every item cites something specific in the linked material.',
+        'The two essay items ask for the author\'s argument, not opinion.',
+        'Cloze items quote sentences from the material with key terms gapped.'
+      ]
+    },
+
+    dl_video: {
+      label: '📚 Video Comprehension — video link',
+      role: 'a media-literacy teacher preparing a linked-video assignment: the video link plus the comprehension quiz that proves it was watched',
+      mission: 'The student opens the VIDEO LINK the teacher shares, watches it, then answers. Every question must be answerable only by someone who actually watched — anchored to moments, demonstrations and spoken claims in the video.',
+      ref: { mcq: 10, true_false: 3, short_answer: 3, ordering: 2, essay: 2 }, dominant: 'mcq',
+      sections: [
+        ['THE LINKED VIDEO', 'The video is at this link (YouTube / Drive):\n{{SOURCE}}\nThis platform stores LINKS ONLY — never uploads. If you cannot open\nlinks, say so in ONE line and ask the teacher for the transcript or a\ndescription of the video; then continue from that.'],
+        ['ANCHOR TO THE TIMELINE', 'Reference visible moments ("the demonstration at the start", "the second\nexperiment", "the final summary"). Use ordering items to sequence the\nsteps the video actually shows.'],
+        ['TEACHER SETUP NOTE (include as a comment in Col7 of row 1)', 'Remind the teacher: share the same link with students (assignment\ninstructions or the exam\'s intro text), then import this CSV on the\nTeacher Hub — Create Assessment → upload CSV — so the quiz marks itself\nand feeds the results report.']
+      ],
+      quality: [
+        'Every item is anchored to a specific moment or claim in the video.',
+        'Ordering items sequence steps exactly as demonstrated.',
+        'No item is answerable from the title alone.'
+      ]
+    },
+
+    assignment: {
+      label: '📝 Assignment brief + rubric (link-based)',
+      role: 'a curriculum-aligned assignment designer writing a complete take-home task',
+      mission: 'Produce a professional assignment BRIEF (not an exam): the task, the linked resources, the submission expectations and a transparent marking rubric a parent could read. Then a short self-check quiz the teacher may optionally import as a CBT.',
+      ref: { essay: 3, short_answer: 4, mcq: 3 }, dominant: 'short_answer',
+      sections: [
+        ['PART 1 — THE ASSIGNMENT BRIEF (plain text, BEFORE the CSV)', 'Write these sections in clear student-facing language:\n  TITLE — one line.\n  TASK — exactly what to produce, in numbered steps.\n  RESOURCES — this link (Drive/web, LINKS ONLY, never uploads):\n  {{SOURCE}}\n  DELIVERABLE — what the student hands in and HOW (a link or physical\n  work handed to the teacher).\n  DUE — leave as [DUE DATE] for the teacher to fill.\n  RUBRIC — a marks table totalling [TOTAL MARKS]: criterion, what full marks\n  looks like, marks available. Plain language a parent could read.'],
+        ['PART 2 — THE SELF-CHECK QUIZ (the CSV)', 'After the brief, output the CSV: a short self-check the student answers\nBEFORE submitting, testing that they understood the task and the resource.\nThe teacher may import it on the Teacher Hub as a low-stakes check.'],
+        ['TEACHER SETUP NOTE (last line of the brief)', 'Remind the teacher: paste the brief into the exam\'s intro/instructions\nfield when creating the assessment from this CSV, and share the resource\nlink with students.']
+      ],
+      quality: [
+        'The brief is complete enough to hand out without editing (except the due date).',
+        'The rubric criteria add up to exactly the stated total marks.',
+        'Every resource is a LINK — the brief never asks for a file upload.',
+        'The self-check quiz tests understanding of the TASK and RESOURCE, not new content.'
       ]
     },
 
@@ -512,6 +635,11 @@ const PromptStudio = {
     past_paper: ['source'],
     comprehension: ['source'],
     from_syllabus: ['source'],
+    material_upload: ['source'],
+    material_link: ['source'],
+    dl_article: ['source'],
+    dl_video: ['source'],
+    assignment: ['source'],
     multi_subject: ['subjects']
   },
 
@@ -576,6 +704,9 @@ const PromptStudio = {
     }
 
     const fill = (t) => String(t)
+      /* {{SOURCE}} in a pack's own sections (material/link packs) receives the
+         teacher's source text directly; function form avoids $-pattern leaks. */
+      .replace(/\{\{SOURCE\}\}/g, () => (opts.source && String(opts.source).trim()) || '[PASTE YOUR NOTES / TEXTBOOK SECTION / LINK OR PASTED TEXT HERE]')
       .replace(/\[SUBJECT\]/g, subject)
       .replace(/\[TOPIC\]/g, topic)
       .replace(/\[CLASS\/LEVEL\]/g, lv)

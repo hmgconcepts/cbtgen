@@ -3,19 +3,44 @@
 --   Maintenance EXTRACT from complete-schema.sql — everything here is already
 --   inside the master file. Run this ONLY to repair/inspect one subsystem on an
 --   existing installation without touching anything else. All statements are
---   idempotent (OR REPLACE / IF NOT EXISTS / ON CONFLICT), so re-running is safe.
+--   idempotent, so re-running is safe.
 --   New installs: run database/complete-schema.sql ONCE and you are done.
 -- ============================================================================
 BEGIN;
---     free projects after ~7 days without REAL database activity, so each
---     heartbeat performs a genuine UPDATE through sc_keep_alive().
+/* -- module function reset: drop this module's functions in ANY historical
+   -- signature before recreating them (prevents 42P13 return-type errors on
+   -- upgraded installs). CASCADE is safe: this module recreates everything it
+   -- owns below, and no data is touched. */
+DO $modulereset$
+DECLARE fn RECORD;
+BEGIN
+  FOR fn IN
+    SELECT p.oid::regprocedure AS signature
+    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname IN (
+      'sc_keep_alive',
+      'keep_alive_ping',
+      'get_heartbeat_status'
+      )
+  LOOP
+    BEGIN
+      EXECUTE 'DROP FUNCTION ' || fn.signature || ' CASCADE';
+      RAISE NOTICE 'module reset: dropped %', fn.signature;
+    EXCEPTION WHEN undefined_function THEN NULL;
+              WHEN dependent_objects_still_exist THEN NULL;
+    END;
+  END LOOP;
+END
+$modulereset$;
+
+
 CREATE TABLE IF NOT EXISTS public.sc_heartbeat (
   id          INTEGER PRIMARY KEY,
   last_ping   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_source TEXT,
   ping_count  BIGINT NOT NULL DEFAULT 0
 );
-
 
 -- 6.1 The heartbeat RPC — real UPDATE, callable with the anon key,
 --     exposes no school data. Returns the new last_ping timestamp.
@@ -79,12 +104,6 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.sc_keep_alive(TEXT) TO anon, authenticated;
 
--- ============================================================================
--- SECTION 15 — LAYER 4: PG_CRON INTERNAL HEARTBEAT (best effort)
--- ============================================================================
--- An additional FULLY-INTERNAL keep-alive: the database schedules itself
--- every 2 days. Wrapped so installation never fails where pg_cron is
--- unavailable (all external layers keep protecting the project regardless).
 DO $cronsetup$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'pg_cron') THEN
@@ -101,5 +120,8 @@ BEGIN
   END IF;
 END
 $cronsetup$;
+
+-- ============================================================================
+
 
 COMMIT;

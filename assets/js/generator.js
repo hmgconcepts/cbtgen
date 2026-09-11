@@ -4,7 +4,7 @@
    Includes:
      • 50+ Professional & Sophisticated Themes
      • 50+ Modern Typography Font Stacks (Google Fonts + System Stacks)
-     • 20+ Responsive Layout Styles
+     • 50 Responsive Layout Styles (real CSS layers)
      • In-Browser ZIP Packaging Engine via JSZip
    ==================================================================== */
 const CBTGenerator = {
@@ -116,7 +116,7 @@ const CBTGenerator = {
     { id: 'system-ui', name: 'Native System Stack (San Francisco/Segoe)', family: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }
   ],
 
-  // 20+ Layout Styles
+  // 50 Layout Styles — each maps to a real CSS layer (LAYOUT_CSS)
   LAYOUTS: [
     { id: 'classic-sidebar', name: 'Classic Sidebar Left (Standard)' },
     { id: 'top-navbar', name: 'Top Navbar Floating' },
@@ -137,7 +137,37 @@ const CBTGenerator = {
     { id: 'stepper-wizard', name: 'Multi-Step Guided Wizard' },
     { id: 'cards-masonry', name: 'Masonry Assessment Cards' },
     { id: 'dock-bottom', name: 'Mac-Style Floating Bottom Dock' },
-    { id: 'dual-pane-review', name: 'Dual-Pane Side-by-Side Review' }
+    { id: 'dual-pane-review', name: 'Dual-Pane Side-by-Side Review' },
+    { id: 'magazine-editorial', name: 'Magazine Editorial Spread' },
+    { id: 'corporate-trust', name: 'Corporate Trust Banking' },
+    { id: 'ivory-league', name: 'Ivy-League Prospectus' },
+    { id: 'soft-neumorphic', name: 'Soft Neumorphic Panels' },
+    { id: 'claymorphism', name: 'Claymorphism Playful Cards' },
+    { id: 'aurora-gradient', name: 'Aurora Gradient Mesh' },
+    { id: 'midnight-observatory', name: 'Midnight Observatory' },
+    { id: 'heritage-parchment', name: 'Heritage Parchment Academy' },
+    { id: 'scandi-air', name: 'Scandinavian Air & Whitespace' },
+    { id: 'swiss-grid', name: 'Swiss International Grid' },
+    { id: 'bento-box', name: 'Bento Box Modular Tiles' },
+    { id: 'newspaper-broadsheet', name: 'Newspaper Broadsheet Columns' },
+    { id: 'terminal-amber', name: 'Amber Terminal Console' },
+    { id: 'blueprint-draft', name: 'Engineering Blueprint Draft' },
+    { id: 'gallery-museum', name: 'Gallery Museum Framing' },
+    { id: 'focus-spotlight', name: 'Focus Spotlight Stage' },
+    { id: 'calm-study-hall', name: 'Calm Study Hall' },
+    { id: 'vivid-classroom', name: 'Vivid Classroom Energy' },
+    { id: 'mono-resume', name: 'Monochrome Résumé Precision' },
+    { id: 'eco-botanical', name: 'Eco Botanical Notes' },
+    { id: 'fintech-dashboard', name: 'FinTech Dashboard Pro' },
+    { id: 'startup-launch', name: 'Startup Launch Landing' },
+    { id: 'exam-hall-formal', name: 'Formal Exam Hall' },
+    { id: 'library-index', name: 'Library Card Index' },
+    { id: 'gridlock-data', name: 'Gridlock Data Dense' },
+    { id: 'ribbon-banner', name: 'Ribbon & Banner Celebratory' },
+    { id: 'geometric-bauhaus', name: 'Geometric Bauhaus Blocks' },
+    { id: 'typewriter-script', name: 'Typewriter Script Vintage' },
+    { id: 'neon-outline', name: 'Neon Outline Gaming' },
+    { id: 'accessible-large', name: 'Accessible Large-Print' }
   ],
 
   defaultConfig: {
@@ -148,8 +178,11 @@ const CBTGenerator = {
     layoutId: 'classic-sidebar',
     primaryColor: '#10b981',
     accentColor: '#8b5cf6',
-    supabaseUrl: 'https://pstnsaqjshmtintjrnas.supabase.co',
-    supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdG5zYXFqc2htdGludGpybmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDEzODUsImV4cCI6MjA5MTI3NzM4NX0.KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w',
+    /* ISSUE-2 FIX: deliberately EMPTY. These are the CLIENT's credentials,
+       typed fresh in Step 3 for every package — never pre-filled with the
+       builder's own project keys. */
+    supabaseUrl: '',
+    supabaseAnonKey: '',
     driveClientId: '',
     supportEmail: 'hismarvellousgrace@gmail.com',
     supportPhone: '+234 810 086 6322',
@@ -174,7 +207,7 @@ const CBTGenerator = {
   TEMPLATE_PREFIX: 'templates/',
   MANIFEST: {
     pages: [
-      'index.html', 'student.html', 'teacher.html', 'cbt-multi.html', 'cbt-prompts.html',
+      'index.html', 'student.html', 'teacher.html', 'cbt-multi.html', 'cbt-prompts.html', 'question-types.html',
       'admin.html', 'admin-data.html', 'storage.html', 'platform-health.html',
       'status-manager.html', 'settings.html', 'license.html', 'activity_log.html',
       'certificate.html', 'deployment_validator.html', 'feature_guide.html',
@@ -201,7 +234,8 @@ const CBTGenerator = {
       'README.md', 'DEPLOYMENT.md', 'FEATURES.md', 'SECURITY.md', 'ANTI_CHEAT_CONFIG_GUIDE.md',
       'SUPABASE_FREE_TIER_PROTECTION.md', 'GOOGLE_DRIVE_BACKUP.md', 'LICENSE', 'llms.txt',
       'database/README.md', 'FIXES_APPLIED.md', 'PHASE2_ENHANCEMENTS.md',
-      'PHASE3_AUDIT_AND_FIXES.md', 'PHASE4_AUDIT_AND_FIXES.md'
+      'PHASE3_AUDIT_AND_FIXES.md', 'PHASE4_AUDIT_AND_FIXES.md', 'PHASE5_AUDIT_AND_FIXES.md',
+      'PHASE6_AUDIT_AND_FIXES.md'
     ],
     infra: [
       'database/complete-schema.sql', 'database/keep-alive.sql', 'database/security-hardening.sql',
@@ -272,18 +306,41 @@ const CBTGenerator = {
     let out = text;
     const base = String(cfg.deployUrl || '').trim().replace(/\/+$/, '');
     if (base && /^https:\/\//.test(base)) {
+      out = out.replace(/__CLIENT_SITE_URL__/g, () => base);
       out = out.replace(/https:\/\/cbtsystem-hmgacademy\.vercel\.app/g, base);
       out = out.replace(/https:\/\/hmgacademyhub\.github\.io\/cbtplatform/g, base);
       out = out.replace(/Host: https:\/\/hmgacademyhub\.github\.io/, 'Host: ' + base);
+    } else {
+      /* sitemap/robots URLs MUST be absolute — without a known deployment URL
+         ship an explicit, replaceable marker (commented in the files). */
+      out = out.replace(/__CLIENT_SITE_URL__/g, () => 'https://YOUR-DEPLOYMENT-URL');
     }
     return this.brandText(out, cfg);
+  },
+
+  /* ══ SEO pass for HTML/docs ══════════════════════════════════════════
+     Resolves __CLIENT_SITE_URL__ (canonical, og:url, og:image, JSON-LD url).
+     With a Deployment URL → absolute, search-engine-perfect URLs.
+     Without → root-relative URLs (/student.html), which stay correct on
+     ANY domain the client later deploys to — never a wrong-domain canonical. */
+  brandSeo(text, cfg) {
+    const base = String(cfg.deployUrl || '').trim().replace(/\/+$/, '');
+    if (base && /^https:\/\//.test(base)) {
+      return text.replace(/__CLIENT_SITE_URL__/g, () => base);
+    }
+    return text.replace(/__CLIENT_SITE_URL__\//g, '/')   /* token + slash → root-relative */
+               .replace(/__CLIENT_SITE_URL__/g, '/');
   },
 
   /* Brand a text file: name, tagline, colors, Supabase credentials. */
   brandText(text, cfg) {
     const name = cfg.institutionName.replace(/'/g, "''");
     let out = text;
-    // Credentials first (precise literals)
+    // Credentials first — placeholder TOKENS are the primary mechanism…
+    out = out.replace(/__CLIENT_SUPABASE_URL__/g, cfg.supabaseUrl);
+    out = out.replace(/__CLIENT_SUPABASE_KEY__/g, cfg.supabaseAnonKey);
+    // …and the legacy HMG literals are swept too, in case any file still
+    // carries them (defence in depth — nothing of ours may ever ship).
     out = out.replace(/https:\/\/pstnsaqjshmtintjrnas\.supabase\.co/g, cfg.supabaseUrl);
     out = out.replace(/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdG5zYXFqc2htdGludGpybmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDEzODUsImV4cCI6MjA5MTI3NzM4NX0\.KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w/g, cfg.supabaseAnonKey);
     // Brand names (longest first so the short one cannot corrupt the long one)
@@ -303,6 +360,79 @@ const CBTGenerator = {
   /* Apply the selected theme + font by rewriting the CSS custom
      properties in style.css (the OLD generator only swapped the first
      font-family declaration — themes never actually applied). */
+  /* ════════════════════════════════════════════════════════════════
+     LAYOUT ENGINE — layoutId is not a label: every layout below appends a
+     distinct CSS layer to style.css that reshapes radius, shadows, content
+     width, header treatment and card styling across the whole platform.
+     ════════════════════════════════════════════════════════════════ */
+  LAYOUT_CSS: {
+    'classic-sidebar':      { radius: '14px', wrap: '1280px' },
+    'top-navbar':           { radius: '14px', wrap: '1240px', header: 'position:sticky;top:12px;margin:0 16px;border-radius:16px;border:1px solid var(--border);' },
+    'glassmorphism-glow':   { radius: '18px', wrap: '1200px', card: 'background:color-mix(in srgb,var(--surface) 72%,transparent);backdrop-filter:blur(18px);border-color:color-mix(in srgb,var(--primary) 22%,transparent);', header: 'background:color-mix(in srgb,var(--surface) 55%,transparent);backdrop-filter:blur(20px);' },
+    'brutalist-minimal':    { radius: '0px',  wrap: '1320px', card: 'border:2px solid var(--text);box-shadow:6px 6px 0 var(--text);', header: 'border-bottom:3px solid var(--text);' },
+    'floating-island':      { radius: '20px', wrap: '1160px', card: 'box-shadow:0 18px 44px rgba(0,0,0,.45);transform:translateY(0);transition:transform .2s;', cardHover: 'transform:translateY(-3px);' },
+    'split-executive':      { radius: '10px', wrap: '1400px', card: 'border-left:4px solid var(--primary);' },
+    'terminal-developer':   { radius: '6px',  wrap: '1080px', card: 'font-size:13.5px;padding:18px;', header: 'font-family:ui-monospace,Consolas,monospace;' },
+    'tabbed-focus':         { radius: '12px', wrap: '1000px', card: 'border-top:3px solid var(--accent);' },
+    'academic-broadsheet':  { radius: '4px',  wrap: '1360px', card: 'border:1px solid var(--border-light);box-shadow:none;', header: 'background:var(--bg);' },
+    'mobile-drawer-app':    { radius: '16px', wrap: '860px',  card: 'padding:18px;' },
+    'dashboard-grid':       { radius: '12px', wrap: '1440px', card: 'padding:20px;' },
+    'cinema-wide':          { radius: '14px', wrap: '1720px' },
+    'stacked-feed':         { radius: '16px', wrap: '760px' },
+    'zen-distraction-free': { radius: '12px', wrap: '720px',  card: 'box-shadow:none;border:none;background:transparent;padding:28px 8px;' },
+    'sidebar-right':        { radius: '14px', wrap: '1280px', card: 'border-right:4px solid var(--accent);' },
+    'compact-kiosk':        { radius: '8px',  wrap: '1020px', card: 'padding:14px;margin-bottom:12px;' },
+    'stepper-wizard':       { radius: '14px', wrap: '920px',  card: 'border-top:3px solid var(--primary);' },
+    'cards-masonry':        { radius: '16px', wrap: '1280px', card: 'margin-bottom:14px;' },
+    'dock-bottom':          { radius: '18px', wrap: '1120px', header: 'position:fixed;bottom:0;top:auto;border-radius:18px 18px 0 0;border-bottom:none;margin:0 12px;' },
+    'dual-pane-review':     { radius: '10px', wrap: '1500px', card: 'border-left:1px solid var(--border);border-right:1px solid var(--border);' },
+    'magazine-editorial':   { radius: '0px',  wrap: '1180px', card: 'border:none;border-top:3px double var(--text-muted);box-shadow:none;padding:28px 6px;', header: 'border-bottom:1px solid var(--text-muted);text-transform:uppercase;letter-spacing:2px;' },
+    'corporate-trust':      { radius: '8px',  wrap: '1260px', card: 'border-top:4px solid var(--primary);box-shadow:0 2px 10px rgba(0,0,0,.18);' },
+    'ivory-league':         { radius: '6px',  wrap: '1140px', card: 'border:1px solid var(--border-light);box-shadow:0 6px 22px rgba(0,0,0,.22);', header: 'border-bottom:2px solid var(--accent);' },
+    'soft-neumorphic':      { radius: '22px', wrap: '1180px', card: 'box-shadow:8px 8px 20px rgba(0,0,0,.45),-6px -6px 16px rgba(255,255,255,.03);border:none;' },
+    'claymorphism':         { radius: '26px', wrap: '1120px', card: 'border:2px solid rgba(255,255,255,.06);box-shadow:inset 0 -8px 16px rgba(0,0,0,.28),0 14px 30px rgba(0,0,0,.35);' },
+    'aurora-gradient':      { radius: '18px', wrap: '1240px', bg: 'radial-gradient(900px 420px at 12% -8%,color-mix(in srgb,var(--primary) 24%,transparent),transparent 60%),radial-gradient(800px 400px at 88% -12%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 60%),var(--bg)', card: 'backdrop-filter:blur(6px);' },
+    'midnight-observatory': { radius: '16px', wrap: '1200px', bg: 'radial-gradient(1200px 600px at 50% -20%,color-mix(in srgb,var(--info) 14%,transparent),transparent 70%),var(--bg)', card: 'box-shadow:0 0 0 1px var(--border),0 24px 60px rgba(0,0,0,.5);' },
+    'heritage-parchment':   { radius: '4px',  wrap: '1100px', card: 'border:1px solid color-mix(in srgb,var(--warning) 35%,var(--border));box-shadow:none;', header: 'border-bottom:2px solid color-mix(in srgb,var(--warning) 45%,transparent);' },
+    'scandi-air':           { radius: '14px', wrap: '1060px', card: 'box-shadow:none;padding:32px;' },
+    'swiss-grid':           { radius: '0px',  wrap: '1300px', card: 'border:1px solid var(--text);box-shadow:none;padding:20px;', header: 'border-bottom:2px solid var(--text);' },
+    'bento-box':            { radius: '20px', wrap: '1320px', card: 'padding:18px;margin-bottom:12px;border-radius:22px;' },
+    'newspaper-broadsheet': { radius: '0px',  wrap: '1380px', card: 'border:1px solid var(--border-light);box-shadow:none;padding:20px 24px;', header: 'border-bottom:4px double var(--text-muted);' },
+    'terminal-amber':       { radius: '6px',  wrap: '1060px', card: 'border:1px solid color-mix(in srgb,var(--warning) 40%,transparent);', header: 'background:#120c02;border-bottom:1px solid var(--warning);' },
+    'blueprint-draft':      { radius: '2px',  wrap: '1240px', bg: 'repeating-linear-gradient(0deg,transparent 0 31px,color-mix(in srgb,var(--info) 7%,transparent) 31px 32px),var(--bg)', card: 'border:1px dashed color-mix(in srgb,var(--info) 55%,transparent);' },
+    'gallery-museum':       { radius: '12px', wrap: '1160px', card: 'padding:34px;box-shadow:0 30px 70px rgba(0,0,0,.5);border:none;' },
+    'focus-spotlight':      { radius: '14px', wrap: '900px',  card: 'box-shadow:0 0 0 1px var(--border),0 0 60px color-mix(in srgb,var(--primary) 12%,transparent);' },
+    'calm-study-hall':      { radius: '12px', wrap: '1080px', card: 'padding:26px;box-shadow:none;border-color:color-mix(in srgb,var(--text-muted) 25%,var(--border));' },
+    'vivid-classroom':      { radius: '18px', wrap: '1200px', card: 'border-top:4px solid var(--accent);box-shadow:0 10px 30px rgba(0,0,0,.3);' },
+    'mono-resume':          { radius: '6px',  wrap: '1000px', card: 'border-left:3px solid var(--text);box-shadow:none;padding:22px;' },
+    'eco-botanical':        { radius: '16px', wrap: '1120px', card: 'border:1px solid color-mix(in srgb,var(--primary) 30%,var(--border));', header: 'border-bottom:2px solid color-mix(in srgb,var(--primary) 40%,transparent);' },
+    'fintech-dashboard':    { radius: '14px', wrap: '1440px', card: 'box-shadow:0 1px 0 var(--border),0 8px 24px rgba(0,0,0,.25);border-top:2px solid var(--primary);' },
+    'startup-launch':      { radius: '20px', wrap: '1180px', bg: 'linear-gradient(180deg,color-mix(in srgb,var(--primary) 8%,transparent),transparent 30%),var(--bg)', card: 'border:1px solid color-mix(in srgb,var(--primary) 20%,var(--border));' },
+    'exam-hall-formal':     { radius: '4px',  wrap: '1220px', card: 'border:1px solid var(--border);box-shadow:none;padding:22px;', header: 'background:var(--surface-2);' },
+    'library-index':        { radius: '8px',  wrap: '1140px', card: 'border-left:4px solid var(--warning);box-shadow:none;' },
+    'gridlock-data':        { radius: '8px',  wrap: '1560px', card: 'padding:16px;margin-bottom:12px;font-size:13px;' },
+    'ribbon-banner':        { radius: '16px', wrap: '1200px', card: 'border-top:5px solid var(--accent);box-shadow:0 14px 34px rgba(0,0,0,.32);' },
+    'geometric-bauhaus':    { radius: '0px',  wrap: '1260px', card: 'border:3px solid var(--primary);box-shadow:8px 8px 0 var(--accent);' },
+    'typewriter-script':    { radius: '2px',  wrap: '940px',  card: 'font-family:ui-monospace,Consolas,monospace;border:1px solid var(--border-light);box-shadow:none;', header: 'border-bottom:1px dashed var(--text-muted);' },
+    'neon-outline':         { radius: '12px', wrap: '1220px', card: 'border:1px solid color-mix(in srgb,var(--accent) 60%,transparent);box-shadow:0 0 24px color-mix(in srgb,var(--accent) 25%,transparent);' },
+    'accessible-large':     { radius: '10px', wrap: '1040px', card: 'padding:30px;font-size:16px;', header: 'font-size:17px;' }
+  },
+
+  layoutCSS(cfg) {
+    const L = this.LAYOUT_CSS[cfg.layoutId] || this.LAYOUT_CSS['classic-sidebar'] || {};
+    const parts = [];
+    const vars = [];
+    if (L.radius) { vars.push(`--radius:${L.radius};--radius-sm:calc(${L.radius} * .6);--radius-lg:calc(${L.radius} * 1.4);`); }
+    if (L.wrap) vars.push(`--layout-max:${L.wrap};`);
+    if (vars.length) parts.push(`:root{${vars.join('')}}`);
+    if (L.wrap) parts.push(`.main-wrap{max-width:${L.wrap};}`);
+    if (L.header) parts.push(`.app-header{${L.header}}`);
+    if (L.card) parts.push(`.card{${L.card}}`);
+    if (L.cardHover) parts.push(`.card:hover{${L.cardHover}}`);
+    if (L.bg) parts.push(`body{background:${L.bg};}`);
+    return parts.length ? `\n\n/* ==== LAYOUT LAYER — "${cfg.layoutId}" (CBT System Generator) ==== */\n` + parts.join('\n') + '\n' : '';
+  },
+
   applyThemeToCSS(css, cfg) {
     let out = css;
     const theme = this.THEMES.find(t => t.id === cfg.themeId) || {};
@@ -389,8 +519,8 @@ This ZIP is a COMPLETE, deployable platform. Nothing else is needed.
 
 ## What is inside
 
-- 3 portals (student / teacher / admin) + multi-subject CBT + AI prompt studio
-- 18 question types, proctoring & anti-cheat, certificates with verification
+- 3 portals (student / teacher / admin) + multi-subject CBT + AI prompt studio (24 packs)
+- 20 question types (dedicated question-types.html reference included), proctoring & anti-cheat, certificates with verification
 - Settings console (branding, CBT defaults, accessibility, security, ACL)
 - Admin Data (backups, Drive sync, dry-run restores, disaster recovery)
 - Storage Manager (real table sizes, Archive Vault, archive-first purging)
@@ -410,6 +540,9 @@ Powered by the HMG Academy Ecosystem.
     const cfg = Object.assign({}, this.defaultConfig, customConfig || {});
     if (!cfg.institutionName || cfg.institutionName.trim().length < 2) {
       throw new Error('Enter an institution name first.');
+    }
+    if (!cfg.supabaseUrl || !cfg.supabaseUrl.trim()) {
+      throw new Error('Enter the CLIENT\'s Supabase project URL first (Supabase → Settings → API).');
     }
     if (!cfg.supabaseUrl.startsWith('https://')) {
       throw new Error('Supabase URL must start with https:// (get it from Supabase → Settings → API).');
@@ -451,7 +584,7 @@ Powered by the HMG Academy Ecosystem.
       try {
         let text = await this.fetchText(this.TEMPLATE_PREFIX + file);
         if (file === 'assets/css/style.css') {
-          text = this.applyThemeToCSS(text, cfg);
+          text = this.applyThemeToCSS(text, cfg) + this.layoutCSS(cfg);
         } else if (file === 'assets/js/app.js') {
           text = this.brandText(text, cfg) + this.brandConfigSnippet(cfg);
         } else if (file === 'manifest.webmanifest') {
@@ -461,9 +594,17 @@ Powered by the HMG Academy Ecosystem.
         } else if (file === 'sitemap.xml' || file === 'robots.txt') {
           text = this.brandSitemapRobots(text, cfg);
         } else if (file.endsWith('.html')) {
-          text = this.brandHtmlHead(this.brandText(text, cfg), cfg);
+          text = this.brandHtmlHead(this.brandSeo(this.brandText(text, cfg), cfg), cfg);
         } else {
-          text = this.brandText(text, cfg);
+          /* every other text file (docs, sql, yml, xml, headers) gets the same
+             credential + SEO passes — a token in ANY file must resolve, never ship */
+          text = this.brandSeo(this.brandText(text, cfg), cfg);
+        }
+        /* HARD LEAK SCAN — the client's package must never carry the builder's
+           Supabase credentials (or an unresolved placeholder token). */
+        const leak = /pstnsaqjshmtintjrnas\.supabase\.co|KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w|__CLIENT_SUPABASE_(URL|KEY)__|__CLIENT_SITE_URL__/.test(text);
+        if (leak) {
+          throw new Error('credential leak detected — file still contains builder credentials or an unresolved placeholder');
         }
         zip.file(file, text);
         included.push(file);

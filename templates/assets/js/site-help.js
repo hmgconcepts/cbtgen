@@ -17,7 +17,7 @@ const SiteHelp = {
         { name: 'Portal Launcher', desc: 'Three portals, and only three: Candidate Exam Portal (take a test — no account needed), Teacher Login (the assessment hub for staff), and Admin Login (platform governance). All internal tools — Multi-Subject Builder, AI Prompts Studio, Data & Sync, Storage, Health, Roles, Settings, License, Audit — live INSIDE the teacher and admin workspaces after sign-in, never on this public page.' },
         { name: 'Take-Exam Card', desc: 'Candidates paste the exam LINK or the 6-character CODE their teacher gave them, type their name and class (or registered Student ID), and enter the proctored exam runner.' },
         { name: 'Install Prompt (banner + weekly reminder)', desc: 'The platform repeatedly offers to install itself as an app — full-screen, faster, better on weak networks. Android/Chrome: Install app. iPhone: Safari → Share → Add to Home Screen. Dismissal is remembered; "never ask" is honoured.' },
-        { name: 'Feature Showcase', desc: 'An interactive catalogue of everything included — 17 question types, anti-cheat tools, calculator, maths keyboard, Drive backup, certificates — so stakeholders can evaluate before registering.' },
+        { name: 'Feature Showcase', desc: 'An interactive catalogue of everything included — 20 question types, anti-cheat tools, calculator, maths keyboard, Drive backup, certificates — so stakeholders can evaluate before registering.' },
         { name: 'Verify Certificate', desc: 'Employers and parents can verify any result certificate by its code without logging in.' }
       ],
       tips: ['Bookmark this page — all three portals are one tap from here.', 'Installing the app (banner at the bottom) gives the smoothest exam experience.']
@@ -42,7 +42,7 @@ const SiteHelp = {
       who: 'Teachers and exam officers.',
       summary: 'The complete assessment workbench: create exams from CSV (yours, School Connect\'s or GOSA\'s — auto-detected), manage banks, share codes, watch live submissions, audit subjective scores, and export analytics.',
       sections: [
-        { name: 'Exam Builder (4 input methods)', desc: 'CSV upload (the universal bridge auto-detects HMG 17-column, School Connect/GOSA headers in any order, and headerless positional layouts from both platforms), manual typing with live previews for all 17 types, XLSX/PDF extraction, and reuse of a previous exam\'s bank.' },
+        { name: 'Exam Builder (4 input methods)', desc: 'CSV upload (the universal bridge auto-detects HMG 17-column, School Connect/GOSA headers in any order, and headerless positional layouts from both platforms), manual typing with live previews, plus a dedicated 📖 Question Types Reference page (question-types.html) documenting all 20 types, XLSX/PDF extraction, and reuse of a previous exam\'s bank.' },
         { name: '17 Question Types', desc: 'MCQ, MRQ (multi-response with all-or-nothing marking), True/False, Short answer, Numeric (with tolerance), Matching (with distractors), Ordering, Assertion–Reason, Case Study/Comprehension, Image MCQ, Matrix/Grid, Hot Text, Code, Cloze (multi-blank), Essay (keyword + min-word provisional marking), Categorization, Multi-part Numeric.' },
         { name: 'Exam Settings', desc: 'Duration, attempt limits, passmark, negative marking, result release (instant vs held), scheduling (auto open/close), lockdown mode, calculator/keyboard availability, proctoring switches and custom instructions.' },
         { name: 'Access Codes & Sharing', desc: 'Each published exam gets a unique 6-character code + shareable link (WhatsApp-ready message). Codes can be regenerated; exams can be locked, archived or duplicated.' },
@@ -65,16 +65,29 @@ const SiteHelp = {
       tips: ['Set the combined duration honestly — candidates get ONE timer for all subjects.', 'Give each subject\'s CSV its own Section name so breakdowns stay clean.']
     },
     'cbt-prompts.html': {
-      title: '🤖 AI Questions Prompts Studio — 18 packs, zero API cost',
+      title: '🤖 AI Questions Prompts Studio — 24 packs, zero API cost',
       who: 'Teachers who want large, high-quality question banks fast.',
       summary: 'Builds perfectly-structured prompts that you paste into any FREE AI chat (ChatGPT, Claude, Gemini, DeepSeek). The AI returns a strict CSV that imports straight into the Teacher Hub — validated first.',
       sections: [
-        { name: 'The 18 Packs', desc: 'Simple recall → intermediate mixed → advanced HOTS → enterprise all-17-types → MCQ-only → multi-subject UTME (per-subject budgets + topics) → exam-board simulation (WAEC/NECO/IGCSE/SAT) → from your own source material → marking-scheme explanations → differentiated tiers → multi-line mathematics → misconception hunter → reading comprehension → proctored certification → early-years primary → physics/chemistry units → professional/clinical/legal → syllabus-to-paper.' },
+        { name: 'The 24 Packs', desc: 'Simple recall → intermediate mixed → advanced HOTS → ENTERPRISE all-20-types → 🎯 Auto-Graded Ultimate Pack (every auto-marked type) → MCQ-only → multi-subject UTME (per-subject budgets + topics) → exam-board simulation (WAEC/NECO/IGCSE/SAT) → from a past paper → marking-scheme explanations → differentiated tiers → multi-line mathematics → misconception hunter → reading comprehension → proctored certification → early-years primary → physics/chemistry units → professional/clinical/legal → syllabus-to-paper → 📄 uploaded-material CBT → 🔗 linked-material CBT → 📚 reading-comprehension article link → 📚 video-comprehension link → 📝 assignment brief + rubric.' },
         { name: 'The 17-Column Contract', desc: 'Every prompt enforces the exact CSV header the platform parses (Question, A, B, C, D, CorrectAnswer, Explanation, Type, Tolerance, Unit, Accept, MRQ_AON, Pairs, Items, Difficulty, Tags, Section). The AI cannot invent its own format.' },
         { name: 'Explanation Standard', desc: 'Each generated question must carry a 4-move marking-scheme explanation: verdict in words → numbered reasoning → the misconception behind every wrong option → a takeaway. The final checklist grades the AI against it.' },
         { name: 'Validator & Loader', desc: 'Paste the AI output back; the validator checks the header, row shapes, answer keys and JSON cells, reports problems per row, previews the questions, then loads them straight into the Teacher Hub bank.' }
       ],
       tips: ['Distribution maths is exact: ask for 25 questions and every pack scales to exactly 25.', 'Multi-subject pack: fill the subjects field (e.g. "English:60,Maths:40") and it builds per-subject budgets.', 'Never accept an AI answer that ignores the checklist — regenerate.']
+    },
+    'question-types.html': {
+      title: '📖 Question Types Guide — the complete 20-type reference',
+      who: 'Teachers and content builders writing question banks.',
+      summary: 'The dedicated reference for every question type the platform supports: what each CSV column means, a copy-paste example row for each type, how it is scored, and what the student actually sees. Keeps the Create Assessment page clean — the full reference lives here.',
+      sections: [
+        { name: 'Jump-to-a-type chips', desc: 'Tap any type id (mcq, mrq, range, hotspot…) to scroll straight to its card.' },
+        { name: 'The 14-column CSV contract', desc: 'Columns 1–7 are the classic base format; columns 8–14 are optional extensions (type, tolerance, unit, accepted answers, MRQ marking mode, pairs, items JSON). Leave optional columns blank for simple MCQs.' },
+        { name: 'Type cards (grouped)', desc: 'Core (mcq, tf, mrq, short, numeric, range) · Pairing & Ordering (matching, ordering, cloze, categorization, multi_numeric, matrix) · Higher-Order (assertion_reason, case_study, image_mcq, essay, code, hot_text) · Visual & Evidence (hotspot, evidence_mcq). Each card shows the exact columns, an example CSV row, the scoring rule and the student experience.' },
+        { name: 'JSON escaping rule', desc: 'When Col13/Col14 contain JSON, wrap the whole cell in double quotes and double every inner double-quote. The AI Prompts Studio generates this escaping automatically.' },
+        { name: 'Cross-platform compatibility', desc: 'School Connect / GOSA Portal CSVs import without editing (any column order, their headers and type names are auto-detected), and banks export back out as School Connect-compatible CSV.' }
+      ],
+      tips: ['Keep this page open in a second tab while you build CSVs — every example row is copy-paste ready.', 'New in this release: range (estimation), hotspot (tap-the-image) and evidence_mcq (two-part evidence) types.']
     },
     'admin.html': {
       title: '🛡️ Admin Super Panel',

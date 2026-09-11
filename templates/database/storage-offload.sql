@@ -3,11 +3,40 @@
 --   Maintenance EXTRACT from complete-schema.sql — everything here is already
 --   inside the master file. Run this ONLY to repair/inspect one subsystem on an
 --   existing installation without touching anything else. All statements are
---   idempotent (OR REPLACE / IF NOT EXISTS / ON CONFLICT), so re-running is safe.
+--   idempotent, so re-running is safe.
 --   New installs: run database/complete-schema.sql ONCE and you are done.
 -- ============================================================================
 BEGIN;
--- ============================================================================
+/* -- module function reset: drop this module's functions in ANY historical
+   -- signature before recreating them (prevents 42P13 return-type errors on
+   -- upgraded installs). CASCADE is safe: this module recreates everything it
+   -- owns below, and no data is touched. */
+DO $modulereset$
+DECLARE fn RECORD;
+BEGIN
+  FOR fn IN
+    SELECT p.oid::regprocedure AS signature
+    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname IN (
+      'admin_table_stats',
+      'admin_browse_table',
+      'admin_delete_table_rows',
+      'admin_purge_old_results',
+      'admin_restore_archived_rows'
+      )
+  LOOP
+    BEGIN
+      EXECUTE 'DROP FUNCTION ' || fn.signature || ' CASCADE';
+      RAISE NOTICE 'module reset: dropped %', fn.signature;
+    EXCEPTION WHEN undefined_function THEN NULL;
+              WHEN dependent_objects_still_exist THEN NULL;
+    END;
+  END LOOP;
+END
+$modulereset$;
+
+
 -- SECTION 12 — FILE-STORAGE ARCHIVE VAULT (free-tier database offloading)
 -- ============================================================================
 -- The free tier gives each project ~500 MB of DATABASE space but a SEPARATE
@@ -45,6 +74,9 @@ EXCEPTION WHEN OTHERS THEN
   RAISE NOTICE 'Archive bucket setup skipped (%). You can create a private bucket named "archive-vault" from Dashboard → Storage instead.', SQLERRM;
 END
 $vault$;
+
+-- ============================================================================
+
 
 -- 10.1 Table statistics for the Storage Manager (row counts + physical sizes
 --      so admins can see exactly what consumes the 500 MB free-tier DB)

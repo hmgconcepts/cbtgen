@@ -27,7 +27,7 @@
 ## The 4-step workflow
 
 1. **🎨 Brand & Identity** — client school name, tagline, support contacts, default passmark.
-2. **🖌️ Theme & Typography** — 50+ themes (or custom colours), 50+ font stacks, 20+ layouts.
+2. **🖌️ Theme & Typography** — 50 professional themes (or custom colours), 50 professional font stacks, 50 layouts.
 3. **🔌 Backend & License** — the client's Supabase URL + anon key (tested live) and their licence: lifetime or subscription (cycle, expiry, grace days).
 4. **👁️ Preview & Download** — live preview, then the engine fetches every file from `templates/`, brands it, builds the ZIP, **re-opens it and verifies every expected file** before download, and writes a client-specific `START-HERE.md`.
 
@@ -35,7 +35,7 @@
 
 The full CBT system (exactly the contents of `templates/`): the 3-portal homepage
 (candidate / teacher login / admin login — internal tools live behind the staff
-logins), 19 pages, multi-subject UTME mode, AI Prompts Studio (18 packs + full
+logins), 20 pages (incl. the dedicated question-types.html reference), multi-subject UTME mode, AI Prompts Studio (24 packs + full
 copy-paste library, no AI API), proctoring & anti-cheat, governance suite
 (backups, Drive sync, disaster recovery, storage, health, roles, audit),
 verifiable certificates, 1,000-student submission resilience, and a

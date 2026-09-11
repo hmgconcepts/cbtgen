@@ -52,7 +52,7 @@
 </div>
 <script>
 const REQUIRED=[
-  'index.html','teacher.html','student.html','cbt-multi.html','cbt-prompts.html',
+  'index.html','teacher.html','student.html','cbt-multi.html','cbt-prompts.html','question-types.html',
   'admin.html','admin-data.html','storage.html','platform-health.html','status-manager.html',
   'settings.html','license.html','activity_log.html','certificate.html','disaster-recovery.html',
   'deployment_validator.html','feature_guide.html','link_checker.html',
@@ -85,13 +85,20 @@ async function runChecks(){
  const robots=await textOf('robots.txt');
  const sitemap=await textOf('sitemap.xml');
  const index=await textOf('index.html');
+ const studentPage=await textOf('student.html'), certPage=await textOf('certificate.html'), guidePage=await textOf('feature_guide.html');
  results.push(row(robots.includes('Sitemap:')&&robots.includes('Allow: /')?'ok':'warn','Search engine robots.txt',robots?'robots.txt allows crawling and points to sitemap.':'robots.txt missing.'));
- results.push(row(sitemap.includes('<urlset')&&sitemap.includes('/cbtplatform/')?'ok':'warn','XML sitemap',sitemap?'sitemap.xml exists with platform URLs.':'sitemap.xml missing.'));
+ results.push(row(sitemap.includes('<urlset')&&(sitemap.match(/<url>/g)||[]).length>=7?'ok':'warn','XML sitemap — all public pages',sitemap?'sitemap.xml lists every public page (home, index, student, teacher, admin, certificate, feature guide).':'sitemap.xml missing.'));
  results.push(row(index.includes('application/ld+json')&&index.includes('og:title')&&index.includes('canonical')?'ok':'warn','SEO metadata and structured data','Landing page includes canonical, Open Graph and JSON-LD structured data for HMG lead generation.'));
+ const pubPages=[['student.html',studentPage],['certificate.html',certPage],['feature_guide.html',guidePage]];
+ const seoAll=pubPages.every(([n,t])=>t.includes('canonical')&&t.includes('og:title')&&t.includes('name="description"'));
+ results.push(row(seoAll?'ok':'warn','Public-page SEO heads','Every public page (student, certificate, feature guide) carries a description, canonical and Open Graph tags for Google/Bing/Yahoo indexing.'));
+ results.push(row(index.includes('hmgschoolconnect.vercel.app')&&index.includes('gosaportal.vercel.app')&&index.includes('cbtgen.vercel.app')?'ok':'warn','HMG Concepts ecosystem links','Homepage links the School Connect, GOSA Portal and CBT Generator properties and the JSON-LD sameAs binds them for search engines.'));
  const pwaInstall=await textOf('pwa_install_enforcer.js');
  results.push(row(pwaInstall.includes('beforeinstallprompt')&&pwaInstall.includes('Add to Home Screen')?'ok':'warn','PWA install enforcement helper','Install prompt helper is present for phone/tablet/laptop users.'));
  const studentV4=await textOf('student.html');
  const teacherV4=await textOf('teacher.html');
+ const qTypesPage=await textOf('question-types.html');
+ results.push(row(qTypesPage.includes('type-card')&&(qTypesPage.split('id="type-').length-1)>=20?'ok':'warn','Question Types Reference page','question-types.html documents all 20 question types on a dedicated teacher page (linked from the create-exam screen and the sidebar).'));
  results.push(row(studentV4.includes('toggleQuestionNavigator')&&studentV4.includes('floating-nav-toggle')?'ok':'warn','Student navigator hide/show','Students can hide/unhide question numbering during exams.'));
  results.push(row(studentV4.includes('downloadResultHTML')&&studentV4.includes('_cleanResultDocument')&&studentV4.includes('ensureMathKeyboardAlwaysAvailable')?'ok':'warn','v7 student result visibility + STEM keyboard','Student result/question saving uses clean white output and Math/Science keyboard is forced available during active exams.'));
  results.push(row(teacherV4.includes('teacherPrintStudentResult')&&teacherV4.includes('bulkPrintFilteredCertificates')?'ok':'warn','Teacher result/certificate printing','Teacher-side individual and bulk result/certificate printing functions are present.'));

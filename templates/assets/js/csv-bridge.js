@@ -43,6 +43,10 @@
     case_study: 'case_study', image_mcq: 'image_mcq', matrix: 'matrix',
     hot_text: 'hot_text', code: 'code', cloze: 'cloze', essay: 'essay',
     categorization: 'categorization', multi_numeric: 'multi_numeric',
+    range: 'range', estimate: 'range', interval: 'range',
+    hotspot: 'hotspot', image_hotspot: 'hotspot', click_image: 'hotspot',
+    evidence_mcq: 'evidence_mcq', evidence: 'evidence_mcq', evidence_based: 'evidence_mcq',
+    two_part_evidence: 'evidence_mcq',
 
     /* School Connect / GOSA names → HMG */
     true_false: 'tf', boolean: 'tf',

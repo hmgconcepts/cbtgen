@@ -3,7 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CBT System Generator • HMG Academy CBT Pro</title>
+<title>CBT System Generator • Build Your Client's Branded CBT Platform</title>
+<meta name="description" content="Configure and generate a complete branded CBT platform for a school: identity, theme, font, layout, Supabase backend, license model — then download a verified deploy-ready ZIP.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://cbtgen.vercel.app/generator.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CBT System Generator — HMG Concepts">
+<meta property="og:title" content="CBT System Generator — 4-Step Wizard">
+<meta property="og:description" content="Brand, configure and package a complete CBT platform for any school — verified ZIP download.">
+<meta property="og:url" content="https://cbtgen.vercel.app/generator.html">
+<meta name="twitter:card" content="summary">
 <link rel="icon" href="templates/assets/img/hmg-academy-logo.png">
 <link rel="stylesheet" href="templates/assets/css/style.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -69,7 +78,7 @@ function showToast(msg, type, ms){
   <div class="card-title-row">
     <div>
       <h1>⚙️ Whitelabel CBT System Generator</h1>
-      <p>Build a complete, branded CBT platform for any client in 4 steps — <b>50+ themes</b>, <b>50+ font stacks</b>, <b>20+ layouts</b>, baked Supabase credentials, license model and free-tier protection. The output is a deploy-ready ZIP with <b>every file needed</b>, self-verified before download.</p>
+      <p>Build a complete, branded CBT platform for any client in 4 steps — <b>50 professional themes</b>, <b>50 professional font stacks</b>, <b>50 layouts</b>, baked Supabase credentials, license model and free-tier protection. The output is a deploy-ready ZIP with <b>every file needed</b>, self-verified before download.</p>
     </div>
   </div>
 
@@ -120,7 +129,7 @@ function showToast(msg, type, ms){
         <div style="font-size:12.5px;line-height:1.8;">
           • Complete static platform — <b>20 pages</b>, zero build tools, zero servers<br>
           • 3 portals (student / teacher / admin) + Multi-Subject CBT + Prompt Studio<br>
-          • 18 question types, proctoring &amp; anti-cheat, certificates + verifier<br>
+          • 20 question types, proctoring &amp; anti-cheat, certificates + verifier<br>
           • Settings console · Admin Data · Storage Manager · Platform Health<br>
           • Roles &amp; Status manager · Audit log · dual-engine Site License<br>
           • <b>COMPLETE_SCHEMA_SQL.sql</b> — run once, everything installed<br>
@@ -158,7 +167,7 @@ function showToast(msg, type, ms){
         <h2>🔤 Typography &amp; layout</h2>
         <label>Font Stack (50+ options)</label>
         <select id="gen-font-select" onchange="updatePreview()"></select>
-        <label>Interface Layout Style (20+ layouts)</label>
+        <label>Interface Layout Style (50 layouts)</label>
         <select id="gen-layout-select" onchange="updatePreview()"></select>
         <div style="margin-top:14px;padding:14px;border-radius:10px;border:1px dashed var(--border-light);background:var(--bg);" id="font-sample">
           <div style="font-size:11px;color:var(--text-muted);">Sample rendering</div>
@@ -179,16 +188,17 @@ function showToast(msg, type, ms){
         <h2>🔌 Supabase backend injection</h2>
         <p style="font-size:.85rem;color:var(--text-muted);">These credentials are baked into every generated file. Use the client's OWN project (each school needs its own free project — or they all share your data).</p>
         <label>Supabase Project URL *</label>
-        <input type="text" id="gen-sb-url" value="https://pstnsaqjshmtintjrnas.supabase.co">
+        <input type="text" id="gen-sb-url" placeholder="https://YOUR-CLIENT-PROJECT.supabase.co" autocomplete="off" spellcheck="false">
         <label>Supabase Public Anon Key *</label>
-        <textarea id="gen-sb-key" rows="3" style="font-family:ui-monospace,Consolas,monospace;font-size:11px;">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdG5zYXFqc2htdGludGpybmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDEzODUsImV4cCI6MjA5MTI3NzM4NX0.KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w</textarea>
+        <textarea id="gen-sb-key" rows="3" placeholder="Paste the CLIENT'S public anon key (starts with eyJ…)" style="font-family:ui-monospace,Consolas,monospace;font-size:11px;" autocomplete="off" spellcheck="false"></textarea>
         <button class="btn btn-sm btn-outline" onclick="testSupabase()">⚡ Test Connection</button>
         <span id="gen-sb-test" style="font-size:12px;margin-left:8px;"></span>
         <p style="font-size:.78rem;color:var(--danger);margin-top:8px;">⚠️ ONLY the anon/public key — the service_role key bypasses all security and must never ship to a browser.</p>
       </div>
       <div class="card" style="margin-top:14px;">
-        <h2>🌐 Deployment URL (optional)</h2>
+        <h2>🌐 Deployment URL (optional — powers search-engine indexing)</h2>
         <input type="text" id="gen-deploy-url" placeholder="https://client-school.vercel.app">
+        <p style="font-size:12.5px;color:var(--text-muted);margin-top:6px;line-height:1.55;">If you already know where the platform will live (e.g. <code>https://my-school.vercel.app</code>), enter it — the sitemap, canonical tags and social-share tags will point there so Google, Bing and Yahoo can index your client's platform from day one. Leave blank and the package ships with domain-agnostic relative URLs plus a one-line fix explained in <b>DEPLOYMENT.md</b>.</p>
         <p style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">If you already know where the client's platform will live (Vercel / GitHub Pages URL), enter it — the generated <b>sitemap.xml</b> and <b>robots.txt</b> are then pointed at that address. Leave empty to keep the placeholders; they still work after the client deploys.</p>
       </div>
       <div class="card">
@@ -240,7 +250,7 @@ function showToast(msg, type, ms){
           </div>
           <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:left;font-size:12px;line-height:1.7;">
             <strong style="color:var(--primary);">Package contents (verified before download):</strong><br>
-            • 20 pages · 18 JS modules · themed CSS · logos &amp; sample assets<br>
+            • 20 pages · 17 JS modules · themed CSS · logos &amp; sample assets<br>
             • PWA branded to the client (name, icon colours, unique offline cache)<br>
             • sitemap.xml / robots.txt rebased to the client's URL when provided<br>
             • <span class="code-chip">COMPLETE_SCHEMA_SQL.sql</span> (10 tables, 40+ RPCs, RLS, archive vault, pg_cron)<br>

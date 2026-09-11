@@ -522,6 +522,9 @@
   var ALIAS = {
     mrq: 'multi_select', tf: 'true_false', short: 'short_answer',
     fill_blank: 'cloze', image_mcq: 'image_based', scenario_mcq: 'mcq',
+    estimate: 'range', interval: 'range',
+    image_hotspot: 'hotspot', click_image: 'hotspot',
+    evidence: 'evidence_mcq', evidence_based: 'evidence_mcq', two_part_evidence: 'evidence_mcq',
     comprehension: 'case_study', data_interpretation: 'case_study',
     math_equation: 'short_answer', oral_prompt: 'essay', peer_review: 'essay',
     true_false_justify: 'true_false', classification: 'categorization',
@@ -908,10 +911,22 @@
         if (!rows.length && (t === 'cloze' || t === 'ordering')) rows = parseList(q.answer);
         return rows.length > 0;
       }
+      /* hotspot & evidence_mcq: the key lives inside items JSON (region labels /
+         part answers) — an items payload counts as a key even without .answer. */
       if (t === 'hotspot') {
-        var h0 = parseObj(q.items);
-        var regs = Array.isArray(h0.regions) ? h0.regions : [];
-        return (h0.correct != null) || regs.length > 0;
+        var hObj = parseObj(q.items);
+        var hRegs = Array.isArray(hObj.regions) ? hObj.regions : [];
+        return !!(hObj && (hObj.image || hObj.correct != null || hRegs.length));
+      }
+      if (t === 'evidence_mcq') {
+        var eObj = parseObj(q.items);
+        return !!(eObj && (eObj.part1 || eObj.part2));
+      }
+      /* range keys: "15-25" in the answer column OR {min,max} in items */
+      if (t === 'range') {
+        var rObj = parseObj(q.items);
+        if (rObj && rObj.min != null && rObj.max != null) return true;
+        return q.answer != null && /-?\d/.test(String(q.answer));
       }
       var a = q.answer;
       if (Array.isArray(a)) return a.filter(function (x) { return String(x).trim() !== ''; }).length > 0;
@@ -1003,8 +1018,15 @@
         var it = parseObj(q.items);
         var pt1_ans = String((it.part1 || {}).answer || (Array.isArray(q.correct) ? q.correct[0] : (q.correct ? q.correct.split('|')[0] : '')) || '').trim();
         var pt2_ans = String((it.part2 || {}).answer || (Array.isArray(q.correct) ? q.correct[1] : (q.correct ? q.correct.split('|')[1] : '')) || '').trim();
-        var givenA = String(Array.isArray(given) ? given[0] || '' : '').trim();
-        var givenB = String(Array.isArray(given) ? given[1] || '' : '').trim();
+        /* the exam runner stores the two picks as a JSON string "{\"a1\":\"..\",\"a2\":\"..\"}";
+           reviews may hand an object or an array [pick1, pick2]. Accept all shapes. */
+        var gv = null;
+        if (given != null && typeof given === 'object' && !Array.isArray(given)) gv = given;
+        else if (typeof given === 'string' && given.indexOf('a1') !== -1 && given.trim().charAt(0) === '{') {
+          try { var pg = JSON.parse(given); if (pg && typeof pg === 'object') gv = pg; } catch (e) { }
+        }
+        var givenA = String(gv ? (gv.a1 || '') : (Array.isArray(given) ? given[0] || '' : '')).trim();
+        var givenB = String(gv ? (gv.a2 || '') : (Array.isArray(given) ? given[1] || '' : '')).trim();
         
         var points = 0;
         if (norm(givenA) === norm(pt1_ans) && norm(givenA) !== '') points++;
@@ -1056,8 +1078,25 @@
       if (t === 'hotspot') {
         var hs = parseObj(q.items);
         var regs = Array.isArray(hs.regions) ? hs.regions : [];
-        var want = (hs.correct != null ? hs.correct : (regs[0] && regs[0].label)) || '';
+        var want = (q.answer != null && String(q.answer) !== '' ? q.answer
+                  : (hs.correct != null ? hs.correct : (regs[0] && regs[0].label))) || '';
         return res(norm(given) === norm(want) ? max : 0);
+      }
+
+      // RANGE — estimation: any value inside [min, max] earns the mark.
+      if (t === 'range') {
+        var rlo = null, rhi = null;
+        var rit = parseObj(q.items);
+        if (rit && rit.min != null) { rlo = Number(rit.min); rhi = Number(rit.max); }
+        if (rlo == null || rhi == null) {
+          var rm = String(q.answer != null ? q.answer : '').match(/(-?\d+(?:\.\d+)?)\s*[-\u2013\u2212]\s*(-?\d+(?:\.\d+)?)/);
+          if (rm) { rlo = Number(rm[1]); rhi = Number(rm[2]); }
+        }
+        if (rlo == null || rhi == null) { rlo = Number(q.answer); rhi = rlo; }
+        if (rlo > rhi) { var rt = rlo; rlo = rhi; rhi = rt; }
+        var rv = Number(String(given).replace(/[^0-9eE+\-.]/g, ''));
+        if (!isFinite(rv)) return res(0);
+        return res(rv >= rlo && rv <= rhi ? max : 0);
       }
 
       // NUMERIC — tolerance-aware.

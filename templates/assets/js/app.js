@@ -2,8 +2,8 @@
    app.js — HMG CBT Pro Core Application Layer & Global Helpers
    ==================================================================== */
 const App = {
-  SB_URL: 'https://pstnsaqjshmtintjrnas.supabase.co',
-  SB_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdG5zYXFqc2htdGludGpybmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDEzODUsImV4cCI6MjA5MTI3NzM4NX0.KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w',
+  SB_URL: '__CLIENT_SUPABASE_URL__',
+  SB_KEY: '__CLIENT_SUPABASE_KEY__',
   user: null,
   profile: null,
   institution: null,
@@ -210,12 +210,12 @@ const App = {
   /* NAV categories decide which workspace's menu a page shows. teacher.html
      and admin.html are deliberately NOT guard-redirected — they carry their
      own login screens and would otherwise bounce onto themselves. */
-  TEACHER_PAGES: ['teacher.html', 'cbt-multi.html', 'cbt-prompts.html'],
+  TEACHER_PAGES: ['teacher.html', 'cbt-multi.html', 'cbt-prompts.html', 'question-types.html'],
   ADMIN_PAGES: ['admin.html', 'admin-data.html', 'disaster-recovery.html', 'storage.html',
                 'platform-health.html', 'status-manager.html', 'settings.html', 'license.html',
                 'activity_log.html', 'link_checker.html', 'deployment_validator.html'],
   /* GUARD categories decide who may open a page cold. */
-  GUARD_TEACHER_PAGES: ['cbt-multi.html', 'cbt-prompts.html'],
+  GUARD_TEACHER_PAGES: ['cbt-multi.html', 'cbt-prompts.html', 'question-types.html'],
   GUARD_ADMIN_PAGES: ['admin-data.html', 'disaster-recovery.html', 'storage.html',
                       'platform-health.html', 'status-manager.html', 'settings.html', 'license.html',
                       'activity_log.html', 'link_checker.html', 'deployment_validator.html'],
@@ -275,7 +275,8 @@ const App = {
     const TEACHER_NAV = [
       { href: 'teacher.html', label: '👨‍🏫 Dashboard' },
       { href: 'cbt-multi.html', label: '🧪 Multi-Subject' },
-      { href: 'cbt-prompts.html', label: '🤖 AI Prompts' }
+      { href: 'cbt-prompts.html', label: '🤖 AI Prompts' },
+      { href: 'question-types.html', label: '📖 Type Guide' }
     ];
     const ADMIN_NAV = [
       { href: 'admin.html', label: '🛡️ Admin' },

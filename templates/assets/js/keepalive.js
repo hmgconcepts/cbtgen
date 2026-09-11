@@ -33,7 +33,7 @@ const FreeTierKeeper = {
      3) REST read fallback → guaranteed columns (never a write, last resort) */
   async _touchDatabase() {
     const cfg = (window.App && window.App.SB_URL) ? window.App : null;
-    const sbUrl = (cfg && cfg.SB_URL) || 'https://pstnsaqjshmtintjrnas.supabase.co';
+    const sbUrl = (cfg && cfg.SB_URL) || '__CLIENT_SUPABASE_URL__';
     const sbKey = (cfg && cfg.SB_KEY) || null;
     if (!sbKey) return { touched: false, reason: 'no-key' };
 
@@ -113,7 +113,7 @@ const FreeTierKeeper = {
      which layer, and how many total pings were recorded. */
   async readHeartbeat() {
     const cfg = (window.App && window.App.SB_URL) ? window.App : null;
-    const sbUrl = (cfg && cfg.SB_URL) || 'https://pstnsaqjshmtintjrnas.supabase.co';
+    const sbUrl = (cfg && cfg.SB_URL) || '__CLIENT_SUPABASE_URL__';
     const sbKey = (cfg && cfg.SB_KEY) || null;
     if (!sbKey) return null;
     try {

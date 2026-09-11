@@ -277,7 +277,7 @@ exam pages. Full detail: `FIXES_APPLIED.md`. No database migration required.
 
 Understudied the School Connect / GOSA Portal ecosystem and implemented its full governance-resilience-storage-licensing stack, more robustly:
 
-- **New pages depth:** Settings (12 sections), Admin Data (dry-run restores, table browser, demo data), Storage Manager (Archive Vault into File Storage), Platform Health (A–F security posture + heartbeat evidence), Roles & Status (bulk ops + drill-downs), Audit Log (filters + charts + retention), License (dual engine), Prompt Studio (18 packs).
+- **New pages depth:** Settings (12 sections), Admin Data (dry-run restores, table browser, demo data), Storage Manager (Archive Vault into File Storage), Platform Health (A–F security posture + heartbeat evidence), Roles & Status (bulk ops + drill-downs), Audit Log (filters + charts + retention), License (dual engine), Prompt Studio (24 packs), Question Types Reference (question-types.html — all 20 types on a dedicated page).
 - **New modules:** `site-license.js`, `security-guard.js`, `data-portability.js`, `prompt-studio.js` (+ hardened `drive-sync.js`, `keepalive.js`, `app.js`).
 - **Schema v4.0:** 10 tables / 41 RPCs / 24 policies / archive bucket / pg_cron — still one idempotent file.
 - **Free-tier protection:** all 10 layers incl. self-committing heartbeat workflow and auto-restore watchdog; every write verified.

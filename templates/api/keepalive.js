@@ -23,8 +23,8 @@
 //   and the response exposes database_heartbeat proof for monitoring.
 // ====================================================================
 export default async function handler(req, res) {
-  const sbUrl = process.env.SUPABASE_URL || process.env.SB_URL || 'https://pstnsaqjshmtintjrnas.supabase.co';
-  const sbKey = process.env.SUPABASE_ANON_KEY || process.env.SB_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdG5zYXFqc2htdGludGpybmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDEzODUsImV4cCI6MjA5MTI3NzM4NX0.KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w';
+  const sbUrl = process.env.SUPABASE_URL || process.env.SB_URL || '__CLIENT_SUPABASE_URL__';
+  const sbKey = process.env.SUPABASE_ANON_KEY || process.env.SB_KEY || '__CLIENT_SUPABASE_KEY__';
 
   const headers = {
     'apikey': sbKey,

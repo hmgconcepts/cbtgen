@@ -3,10 +3,37 @@
 --   Maintenance EXTRACT from complete-schema.sql — everything here is already
 --   inside the master file. Run this ONLY to repair/inspect one subsystem on an
 --   existing installation without touching anything else. All statements are
---   idempotent (OR REPLACE / IF NOT EXISTS / ON CONFLICT), so re-running is safe.
+--   idempotent, so re-running is safe.
 --   New installs: run database/complete-schema.sql ONCE and you are done.
 -- ============================================================================
 BEGIN;
+/* -- module function reset: drop this module's functions in ANY historical
+   -- signature before recreating them (prevents 42P13 return-type errors on
+   -- upgraded installs). CASCADE is safe: this module recreates everything it
+   -- owns below, and no data is touched. */
+DO $modulereset$
+DECLARE fn RECORD;
+BEGIN
+  FOR fn IN
+    SELECT p.oid::regprocedure AS signature
+    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname IN (
+      'admin_seed_demo_data',
+      'admin_purge_test_results'
+      )
+  LOOP
+    BEGIN
+      EXECUTE 'DROP FUNCTION ' || fn.signature || ' CASCADE';
+      RAISE NOTICE 'module reset: dropped %', fn.signature;
+    EXCEPTION WHEN undefined_function THEN NULL;
+              WHEN dependent_objects_still_exist THEN NULL;
+    END;
+  END LOOP;
+END
+$modulereset$;
+
+
 -- 10.8 One-click demo sample data (Admin Data page) — creates a demo teacher
 --      profile mirror, a demo multi-subject exam with real 17-type questions,
 --      a demo roster and a few results, so new deployments are never empty.
@@ -97,7 +124,6 @@ BEGIN
 END;
 $$;
 
--- ============================================================================
 -- SECTION 14 — SEED DATA (all ON CONFLICT DO NOTHING — re-run safe)
 -- ============================================================================
 
@@ -130,6 +156,9 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO public.platform_settings (id, institution_name)
 VALUES (1, 'HMG Academy CBT Pro')
 ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================================
+
 
 -- Convenience one-liners (run in the Supabase SQL Editor):
 --   Seed / refresh demo data:   SELECT public.admin_seed_demo_data();

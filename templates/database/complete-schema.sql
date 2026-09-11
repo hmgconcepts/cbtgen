@@ -14,7 +14,8 @@
 --
 -- SAFE TO RUN MANY TIMES:
 --   • Every table uses      CREATE TABLE IF NOT EXISTS
---   • Every function uses   CREATE OR REPLACE FUNCTION
+--   • Every function is dropped (all signatures) then recreated, so
+--     upgraded installs never hit the 42P13 return-type conflict
 --   • Every policy is       DROP POLICY IF EXISTS → CREATE POLICY
 --   • Every trigger is      DROP TRIGGER IF EXISTS → CREATE TRIGGER
 --   • Every seed uses       ON CONFLICT DO NOTHING
@@ -25,6 +26,93 @@
 --   Dashboard → your project → SQL Editor → New query → paste this WHOLE file
 --   → Run. Expect a series of "Success" notices. That is all.
 -- ============================================================================
+
+-- ============================================================================
+-- SECTION 0 — FUNCTION-LAYER CLEAN REINSTALL (idempotency hardening)
+-- ============================================================================
+-- WHY THIS EXISTS: CREATE OR REPLACE FUNCTION cannot change the RETURN TYPE or
+-- argument list of a function that already exists — PostgreSQL aborts the whole
+-- run with:
+--     ERROR 42P13: cannot change return type of existing function
+--     HINT: Use DROP FUNCTION <name>(<args>) first.
+-- Any deployment upgraded from an earlier schema version therefore failed
+-- halfway. This section drops EVERY function this script is about to define —
+-- in ALL historical signatures — before the script recreates them below.
+--
+-- SAFETY:
+--   • Only functions THIS SCRIPT fully recreates are touched — nothing else.
+--   • CASCADE is required because RLS policies and triggers depend on several
+--     of them; every policy (Section 11), trigger (Section 13) and storage
+--     rule (Section 12) is re-created later in this same run, so nothing is
+--     left missing at the end.
+--   • Dropping a function never touches its TABLES or DATA.
+--   • Per-function exception guards mean a fresh database (no functions yet)
+--     sails through with zero errors.
+-- ============================================================================
+
+DO $funcreset$
+DECLARE
+  fn RECORD;
+BEGIN
+  FOR fn IN
+    SELECT p.oid::regprocedure AS signature
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname IN (
+      'admin_browse_table',
+      'admin_bulk_set_profile_status',
+      'admin_delete_profile',
+      'admin_delete_table_rows',
+      'admin_get_all_exams',
+      'admin_get_all_profiles',
+      'admin_get_all_results',
+      'admin_get_audit_logs',
+      'admin_get_audit_stats',
+      'admin_get_drive_backups',
+      'admin_get_institutions',
+      'admin_get_platform_stats',
+      'admin_purge_audit_logs',
+      'admin_purge_old_results',
+      'admin_purge_test_results',
+      'admin_restore_archived_rows',
+      'admin_seed_demo_data',
+      'admin_set_profile_role',
+      'admin_set_profile_status',
+      'admin_table_stats',
+      'extend_site_license',
+      'get_exam_attempt_count',
+      'get_exam_teacher_id',
+      'get_heartbeat_status',
+      'get_public_exam_by_code',
+      'get_public_settings',
+      'handle_new_user',
+      'is_exam_open_for_submission',
+      'is_owner',
+      'is_platform_admin',
+      'is_platform_owner',
+      'keep_alive_ping',
+      'log_audit_event',
+      'log_backup_event',
+      'save_platform_settings',
+      'save_site_license',
+      'sc_keep_alive',
+      'submit_student_result',
+      'update_updated_at_column',
+      'verify_certificate',
+      'verify_student_for_exam'
+      )
+  LOOP
+    BEGIN
+      EXECUTE 'DROP FUNCTION ' || fn.signature || ' CASCADE';
+      RAISE NOTICE 'function layer reset: dropped %', fn.signature;
+    EXCEPTION
+      WHEN undefined_function THEN NULL;            -- already gone
+      WHEN dependent_objects_still_exist THEN NULL; -- recreated below anyway
+    END;
+  END LOOP;
+END
+$funcreset$;
 
 -- ============================================================================
 -- SECTION 1 — EXTENSIONS

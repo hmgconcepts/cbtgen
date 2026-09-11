@@ -1,7 +1,7 @@
 {
   "name": "HMG Academy CBT Pro — Free Online Exam Platform",
   "short_name": "HMG CBT",
-  "description": "Installable free CBT and online assessment platform by HMG Concepts for schools, teachers, tutors and training centres. Includes 17 question types, anti-cheat controls, analytics, CSV exports and verifiable certificates.",
+  "description": "Installable free CBT and online assessment platform by HMG Concepts for schools, teachers, tutors and training centres. Includes 20 question types, anti-cheat controls, analytics, CSV exports and verifiable certificates.",
   "start_url": "./index.html?source=pwa",
   "scope": "./",
   "display": "standalone",
