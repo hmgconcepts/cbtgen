@@ -1,0 +1,31 @@
+# CBT System Generator
+
+The CBT System Generator is a free browser-based tool by HMG Concepts / HMG Academy that builds complete, branded CBT (computer-based testing) platforms for client schools. It is a SEPARATE product from the exam platform itself: this site has no student portal, no teacher login and no admin console, and the packages it generates contain no generator files.
+
+Live generator: https://cbtgen.vercel.app
+HMG Academy: https://hmgacademy.pages.dev/
+HMG Concepts: https://hmgconcepts.pages.dev/
+Contact: hismarvellousgrace@gmail.com, +234 810 086 6322, +234 907 790 7677
+Founder: Adewale Samson Adeagbo
+
+How it works (4 steps, all in the browser):
+1. Brand & Identity — client school name, tagline, support contacts, default passmark
+2. Theme & Typography — 50+ colour themes, 50+ font stacks, 20+ layouts (or custom)
+3. Backend & License — client's Supabase URL + anon key (tested live), lifetime or subscription licence
+4. Preview & Download — branded pages previewed, ZIP built, re-opened and every expected file verified before download
+
+What the generated client package contains (from templates/):
+- 3-portal CBT system: candidate exam portal, teacher login hub, admin login console
+- Multi-subject UTME/JAMB tabbed exams with per-subject scoring
+- AI Prompts Studio: 18 prompt packs + full copy-paste library (free AI chats, no AI API)
+- 18 question types, proctoring and anti-cheat, verifiable certificates
+- Governance suite: backups, Google Drive sync, disaster recovery, storage manager, platform health, roles & approvals, audit trail
+- database/ folder: complete-schema.sql is the single all-inclusive idempotent run-once setup file, plus optional maintenance extracts and sample CSVs
+- 1,000-student submission resilience: jitter, exponential-backoff retries, offline auto-flush queue
+- Full documentation: README, DEPLOYMENT, FEATURES, SECURITY, PROMPT_TEMPLATE.md, START-HERE.md
+
+Useful pages:
+- /index.html — generator landing page (what it is, how it works, FAQ)
+- /generator.html — the 4-step wizard
+
+Deploying: static hosting only (Vercel/Netlify/Cloudflare Pages/GitHub Pages). Must be served over http(s) — file:// cannot fetch templates/. JSZip loads from CDN at generation time.

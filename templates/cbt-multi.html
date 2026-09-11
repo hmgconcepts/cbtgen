@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Subject CBT Builder • HMG Academy CBT Pro</title>
+<link rel="icon" href="assets/img/hmg-academy-logo.png">
+<link rel="stylesheet" href="assets/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="assets/js/site-help.js"></script>
+</head>
+<body>
+<header class="app-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand-group">
+      <img src="assets/img/hmg-academy-logo.png" alt="Logo" class="brand-logo">
+      <div>
+        <div class="brand-title">HMG Academy CBT Pro</div>
+        <div class="brand-sub">Multi-Subject UTME / JAMB Builder</div>
+      </div>
+    </a>
+    <nav class="nav-links" id="main-nav"></nav>
+  </div>
+</header>
+
+<main class="main-wrap">
+  <div class="card-title-row">
+    <div>
+      <h1>🧪 Multi-Subject CBT Package Builder</h1>
+      <p>Create a combined multi-subject examination (e.g. UTME / JAMB with English, Mathematics, Physics, Chemistry). Candidates receive ONE access code and can switch subject tabs during the test.</p>
+    </div>
+    <button class="btn btn-primary" onclick="publishMultiSubjectExam()">🚀 Publish Combined Assessment</button>
+  </div>
+
+  <div class="grid-2">
+    <!-- Exam General Settings -->
+    <div class="card">
+      <h2>⚙️ Combined Exam Parameters</h2>
+      
+      <label>Package Title</label>
+      <input type="text" id="ms-title" value="UTME 2026 Mega Mock Assessment" placeholder="e.g. JAMB UTME Comprehensive Practice">
+
+      <div class="grid-2">
+        <div>
+          <label>Target Class / Level</label>
+          <input type="text" id="ms-class" value="SS 3 / UTME Candidates" placeholder="e.g. SS 3">
+        </div>
+        <div>
+          <label>Total Combined Duration (Mins)</label>
+          <input type="number" id="ms-duration" value="120" min="10" max="360">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label>Max Candidate Attempts</label>
+          <input type="number" id="ms-attempts" value="1" min="1" max="99">
+        </div>
+        <div>
+          <label>Negative Marking Penalty</label>
+          <input type="number" id="ms-negative" value="0" step="0.25" min="0">
+        </div>
+      </div>
+
+      <label>Exam Instructions</label>
+      <textarea id="ms-instructions" style="height:80px;" placeholder="e.g. You have 2 hours to complete all 4 subjects. You can switch between subjects at any time."></textarea>
+    </div>
+
+    <!-- Subjects Manager -->
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:12px;">
+        <h2>📚 Subjects in Package</h2>
+        <button class="btn btn-sm btn-outline" onclick="addSubjectSlot()">➕ Add Subject</button>
+      </div>
+      <p style="font-size:12px;">Add each subject and attach its question bank (CSV or JSON).</p>
+
+      <div id="subject-slots-container"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="app-footer">
+  HMG Academy CBT Pro Enterprise · Built with Free-Tier Resilient Architecture · HMG Concepts
+</footer>
+
+<script src="assets/js/app.js"></script>
+<script>
+let subjectsList = [
+  { name: 'Use of English', count: 60, questions: [] },
+  { name: 'Mathematics', count: 40, questions: [] },
+  { name: 'Physics', count: 40, questions: [] },
+  { name: 'Chemistry', count: 40, questions: [] }
+];
+
+function renderSubjectSlots() {
+  const container = document.getElementById('subject-slots-container');
+  container.innerHTML = subjectsList.map((s, idx) => `
+    <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;">
+      <div class="flex-between" style="margin-bottom:8px;">
+        <strong style="color:var(--primary);">Subject ${idx + 1}: ${escapeHtml(s.name)}</strong>
+        ${subjectsList.length > 1 ? `<button class="btn btn-sm btn-danger" onclick="removeSubjectSlot(${idx})">✕</button>` : ''}
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>Subject Name</label>
+          <input type="text" value="${escapeHtml(s.name)}" oninput="subjectsList[${idx}].name = this.value.trim()" style="margin-bottom:6px;">
+        </div>
+        <div>
+          <label>Question Count</label>
+          <input type="number" value="${s.count}" oninput="subjectsList[${idx}].count = Number(this.value)" style="margin-bottom:6px;">
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+        <span>Loaded: <strong>${s.questions.length} questions</strong></span>
+        <input type="file" accept=".csv,.json" onchange="loadSubjectFile(${idx}, this.files[0])" style="font-size:11px;">
+      </div>
+    </div>
+  `).join('');
+}
+
+function addSubjectSlot() {
+  subjectsList.push({ name: `Subject ${subjectsList.length + 1}`, count: 40, questions: [] });
+  renderSubjectSlots();
+}
+
+function removeSubjectSlot(idx) {
+  subjectsList.splice(idx, 1);
+  renderSubjectSlots();
+}
+
+function loadSubjectFile(idx, file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const text = e.target.result;
+      if (text.startsWith('[') || text.startsWith('{')) {
+        subjectsList[idx].questions = JSON.parse(text);
+      } else {
+        const lines = text.split(/\r?\n/).filter(l => l.trim());
+        const dataLines = /^(question|q\b)/i.test(lines[0]) ? lines.slice(1) : lines;
+        subjectsList[idx].questions = dataLines.map((line, i) => {
+          const p = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, '').trim());
+          return {
+            q: p[0] || `Question ${i+1}`,
+            a: p[1] || '',
+            b: p[2] || '',
+            c: p[3] || '',
+            d: p[4] || '',
+            ans: p[5] || 'A',
+            exp: p[6] || '',
+            type: p[7] || 'mcq'
+          };
+        });
+      }
+      showToast(`Loaded ${subjectsList[idx].questions.length} questions for ${subjectsList[idx].name}!`, 'success');
+      renderSubjectSlots();
+    } catch (err) {
+      showToast('Error parsing file: ' + err.message, 'danger');
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function publishMultiSubjectExam() {
+  const title = document.getElementById('ms-title').value.trim();
+  const cls = document.getElementById('ms-class').value.trim();
+  const duration = Number(document.getElementById('ms-duration').value) || 120;
+  const attempts = Number(document.getElementById('ms-attempts').value) || 1;
+  const negative = Number(document.getElementById('ms-negative').value) || 0;
+  const instructions = document.getElementById('ms-instructions').value.trim();
+
+  // Create mock questions if not loaded from file
+  subjectsList.forEach(s => {
+    if (!s.questions.length) {
+      s.questions = Array.from({ length: s.count || 10 }, (_, i) => ({
+        q: `Sample ${s.name} Question ${i + 1}`,
+        a: 'Option A', b: 'Option B', c: 'Option C', d: 'Option D',
+        ans: 'A', exp: `Explanation for ${s.name} Q${i+1}`, type: 'mcq'
+      }));
+    }
+  });
+
+  const session = App.getSession();
+  // FIX: publishing without a teacher session used a placeholder UUID that failed
+  // RLS with a cryptic database error. Fail fast with clear guidance instead.
+  if(!session?.user?.id){
+    showToast('⚠️ Please open the Teacher Hub and sign in first — multi-subject packages must be owned by a teacher account.', 'warning');
+    return;
+  }
+  const teacherId = session.user.id;
+  // FIX (m5): always produce a full 6-character access code
+  let _c='';while(_c.length<6){_c+=Math.random().toString(36).substring(2).replace(/[^a-z0-9]/g,'');}
+  const code = _c.substring(0,6).toUpperCase();
+
+  const payload = {
+    teacher_id: teacherId,
+    code,
+    subject: `${title}|${cls}|Combined|Mock|UTME|2026|50`,
+    duration,
+    attempt_limit: attempts,
+    select_count: 0,
+    negative_mark: negative,
+    is_open: true,
+    is_multi_subject: true,
+    subjects_data: subjectsList,
+    instructions
+  };
+
+  try {
+    showToast('Publishing multi-subject package...', 'info');
+    await App.sbFetch('/rest/v1/exams', 'POST', payload);
+    alert(`🎉 Combined Exam Published Successfully!\n\nStudent Access Code: ${code}\nStudent Link: student.html?code=${code}`);
+    window.location.href = 'teacher.html';
+  } catch (e) {
+    showToast('Publish failed: ' + e.message, 'danger');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', renderSubjectSlots);
+</script>
+<script src="assets/js/chatbot.js"></script>
+</body>
+</html>
