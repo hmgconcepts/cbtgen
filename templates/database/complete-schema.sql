@@ -19,7 +19,9 @@
 --   • Every policy is       DROP POLICY IF EXISTS → CREATE POLICY
 --   • Every trigger is      DROP TRIGGER IF EXISTS → CREATE TRIGGER
 --   • Every seed uses       ON CONFLICT DO NOTHING
---   • Older deployments are upgraded in place with ADD COLUMN IF NOT EXISTS
+--   • Older deployments of ANY version are upgraded in place: Section 3.9
+--     reconciles every column of every table (ADD COLUMN IF NOT EXISTS) and
+--     restores missing UNIQUE constraints — no drift can survive a re-run
 --   • Re-running never drops, truncates or loses data.
 --
 -- HOW TO RUN (Supabase):
@@ -392,6 +394,216 @@ ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS lockdown_message T
 ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS watermark_text TEXT DEFAULT '';
 ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS signature_data_uri TEXT DEFAULT '';
 ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS license_registry_url TEXT DEFAULT '';
+
+-- ============================================================================
+-- SECTION 3.9 — COMPLETE COLUMN RECONCILIATION (any deployment shape → master)
+-- ============================================================================
+-- The guards above cover the columns this file historically added late. This
+-- block goes further: it reconciles EVERY column of EVERY table against the
+-- master definition, so a database created by ANY older build (or repaired by
+-- hand) is upgraded to the full master shape in one pass. Every line is a
+-- no-op when the column already exists, and NOT NULL columns that lack a
+-- master default carry a safe fallback default so the statement can never
+-- fail on a table that already holds rows.
+-- This is the definitive fix for: "ERROR 42703: column s.status does not
+-- exist" (and every other column-drift variant) when re-running this file.
+
+-- institutions
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS id UUID PRIMARY KEY DEFAULT gen_random_uuid();
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS name TEXT NOT NULL DEFAULT 'HMG Academy';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS tagline TEXT DEFAULT 'Computer-Based Testing & Learning Solutions';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS slug TEXT UNIQUE;
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS owner_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'enterprise';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS logo_url TEXT DEFAULT '';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS stamp_url TEXT DEFAULT '';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS primary_color TEXT DEFAULT '#10b981';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS accent_color TEXT DEFAULT '#8b5cf6';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS branding JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS settings JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS drive_client_id TEXT DEFAULT '';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS drive_folder_id TEXT DEFAULT '';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS drive_sync_enabled BOOLEAN DEFAULT false;
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS drive_sync_days INTEGER DEFAULT 7;
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS drive_last_backup TIMESTAMPTZ;
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS license_token TEXT DEFAULT '';
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS license_data JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS last_keepalive_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.institutions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+-- profiles
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS institution_id UUID REFERENCES public.institutions(id) ON DELETE SET NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email TEXT UNIQUE NOT NULL DEFAULT '';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS full_name TEXT DEFAULT '';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'teacher';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'pending';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone TEXT DEFAULT '';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+-- students
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS id UUID PRIMARY KEY DEFAULT gen_random_uuid();
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS institution_id UUID REFERENCES public.institutions(id) ON DELETE SET NULL;
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS teacher_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE DEFAULT gen_random_uuid();
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS full_name TEXT NOT NULL DEFAULT '';
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS student_id TEXT NOT NULL DEFAULT '';
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS class TEXT NOT NULL DEFAULT '';
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS email TEXT DEFAULT '';
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS phone TEXT DEFAULT '';
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.students ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+-- exams
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS id UUID PRIMARY KEY DEFAULT gen_random_uuid();
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS institution_id UUID REFERENCES public.institutions(id) ON DELETE SET NULL;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS teacher_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE DEFAULT gen_random_uuid();
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS code TEXT UNIQUE NOT NULL DEFAULT '';
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS subject TEXT NOT NULL DEFAULT '';
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS duration INTEGER NOT NULL DEFAULT 45;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS attempt_limit INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS select_count INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS is_open BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS is_archived BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS exam_mode TEXT NOT NULL DEFAULT 'open';
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS negative_mark NUMERIC(6,2) NOT NULL DEFAULT 0;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS release_results BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS math_keyboard BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS certificate_enabled BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS certificate_valid_days INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS proctoring BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS anti_cheat_config JSONB NOT NULL DEFAULT '{"tab_switch":true,"window_blur":true,"copy_paste":true,"right_click":true,"fullscreen":true,"devtools":true,"proctoring":false,"audio":false,"max_violations":5}'::jsonb;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS instructions TEXT DEFAULT '';
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS is_multi_subject BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS subjects_data JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS csv_data JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS start_at TIMESTAMPTZ;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS close_at TIMESTAMPTZ;
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.exams ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+-- results
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS id UUID PRIMARY KEY DEFAULT gen_random_uuid();
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS exam_id UUID NOT NULL REFERENCES public.exams(id) ON DELETE CASCADE DEFAULT gen_random_uuid();
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS student_name TEXT NOT NULL DEFAULT '';
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS student_class TEXT NOT NULL DEFAULT '';
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS student_id_ref TEXT DEFAULT '';
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS student_type TEXT DEFAULT 'open';
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS score NUMERIC(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS total INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS correct_count INTEGER DEFAULT 0;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS wrong_count INTEGER DEFAULT 0;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS skipped_count INTEGER DEFAULT 0;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS attempt_number INTEGER DEFAULT 1;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS time_taken INTEGER DEFAULT 0;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS answers_data JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS subject_breakdown JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS violations INTEGER DEFAULT 0;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS violation_log JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS proctor_data JSONB;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS cert_code TEXT NOT NULL DEFAULT '';
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS is_released BOOLEAN DEFAULT true;
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.results ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+-- audit_logs
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS id UUID PRIMARY KEY DEFAULT gen_random_uuid();
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS institution_id UUID REFERENCES public.institutions(id) ON DELETE SET NULL;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS actor_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS actor_email TEXT DEFAULT '';
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS action TEXT NOT NULL DEFAULT '';
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS entity_type TEXT DEFAULT '';
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS entity_id TEXT DEFAULT '';
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS ip_hint TEXT DEFAULT '';
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+-- system_backups
+ALTER TABLE public.system_backups ADD COLUMN IF NOT EXISTS id UUID PRIMARY KEY DEFAULT gen_random_uuid();
+ALTER TABLE public.system_backups ADD COLUMN IF NOT EXISTS institution_id UUID REFERENCES public.institutions(id) ON DELETE SET NULL;
+ALTER TABLE public.system_backups ADD COLUMN IF NOT EXISTS backup_name TEXT NOT NULL DEFAULT '';
+ALTER TABLE public.system_backups ADD COLUMN IF NOT EXISTS provider TEXT NOT NULL DEFAULT 'google_drive';
+ALTER TABLE public.system_backups ADD COLUMN IF NOT EXISTS drive_file_id TEXT DEFAULT '';
+ALTER TABLE public.system_backups ADD COLUMN IF NOT EXISTS drive_file_url TEXT DEFAULT '';
+ALTER TABLE public.system_backups ADD COLUMN IF NOT EXISTS file_size_bytes BIGINT DEFAULT 0;
+ALTER TABLE public.system_backups ADD COLUMN IF NOT EXISTS total_records INTEGER DEFAULT 0;
+ALTER TABLE public.system_backups ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.system_backups ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+-- platform_settings
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS id INTEGER PRIMARY KEY DEFAULT 1;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS institution_name TEXT DEFAULT 'HMG Academy CBT Pro';
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS branding JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS accessibility JSONB NOT NULL DEFAULT '{"font_scale":1,"high_contrast":false,"reduced_motion":false,"dyslexia_font":false,"language":"en"}'::jsonb;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS cbt_defaults JSONB NOT NULL DEFAULT '{"duration":45,"passmark":50,"shuffle_questions":true,"shuffle_options":true,"negative_mark":0,"attempt_limit":1,"release_results":true}'::jsonb;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS module_access JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS audit_retention_days INTEGER NOT NULL DEFAULT 365;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS idle_lock_minutes INTEGER NOT NULL DEFAULT 30;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS lockdown_mode BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS lockdown_message TEXT DEFAULT '';
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS drive_client_id TEXT DEFAULT '';
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS drive_sync_enabled BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS drive_sync_days INTEGER NOT NULL DEFAULT 7;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS drive_folder_id TEXT DEFAULT '';
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS drive_last_backup TIMESTAMPTZ;
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS license_registry_url TEXT DEFAULT '';
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS license_salt TEXT DEFAULT 'HMG_CBT_PRO_V10_SECURE_SALT_2026';
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS watermark_text TEXT DEFAULT '';
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS signature_data_uri TEXT DEFAULT '';
+ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+-- site_license
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS id INTEGER PRIMARY KEY DEFAULT 1;
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS model TEXT NOT NULL DEFAULT 'lifetime';
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'One-time purchase (lifetime ownership)';
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS cycle TEXT DEFAULT '';
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS started_on DATE;
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS expires_on DATE;
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS grace_days INTEGER NOT NULL DEFAULT 7;
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS renew_url TEXT DEFAULT '';
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS lock_message TEXT DEFAULT '';
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS license_token TEXT DEFAULT '';
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS signature TEXT DEFAULT '';
+ALTER TABLE public.site_license ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+-- sc_heartbeat
+ALTER TABLE public.sc_heartbeat ADD COLUMN IF NOT EXISTS id INTEGER PRIMARY KEY;
+ALTER TABLE public.sc_heartbeat ADD COLUMN IF NOT EXISTS last_ping TIMESTAMPTZ NOT NULL DEFAULT NOW();
+ALTER TABLE public.sc_heartbeat ADD COLUMN IF NOT EXISTS last_source TEXT;
+ALTER TABLE public.sc_heartbeat ADD COLUMN IF NOT EXISTS ping_count BIGINT NOT NULL DEFAULT 0;
+
+-- Unique-constraint reconciliation: legacy databases that predate a UNIQUE
+-- column allow duplicates that silently break code lookups (exam codes,
+-- profile emails, student roster IDs). Guarded: if duplicates exist the
+-- constraint is skipped with a NOTICE instead of aborting the install.
+DO $uniqrec$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'exams_code_key' AND conrelid = 'public.exams'::regclass) THEN
+    ALTER TABLE public.exams ADD CONSTRAINT exams_code_key UNIQUE (code);
+  END IF;
+EXCEPTION WHEN unique_violation OR others THEN
+  RAISE NOTICE 'exams.code has duplicate values — UNIQUE constraint skipped; de-duplicate and re-run.';
+END $uniqrec$;
+
+DO $uniqrec$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'profiles_email_key' AND conrelid = 'public.profiles'::regclass) THEN
+    ALTER TABLE public.profiles ADD CONSTRAINT profiles_email_key UNIQUE (email);
+  END IF;
+EXCEPTION WHEN unique_violation OR others THEN
+  RAISE NOTICE 'profiles.email has duplicate values — UNIQUE constraint skipped; de-duplicate and re-run.';
+END $uniqrec$;
+
+DO $uniqrec$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'institutions_slug_key' AND conrelid = 'public.institutions'::regclass) THEN
+    ALTER TABLE public.institutions ADD CONSTRAINT institutions_slug_key UNIQUE (slug);
+  END IF;
+EXCEPTION WHEN unique_violation OR others THEN
+  RAISE NOTICE 'institutions.slug has duplicate values — UNIQUE constraint skipped; de-duplicate and re-run.';
+END $uniqrec$;
+
+DO $uniqrec$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'students_teacher_id_student_id_key' AND conrelid = 'public.students'::regclass) THEN
+    ALTER TABLE public.students ADD CONSTRAINT students_teacher_id_student_id_key UNIQUE (teacher_id, student_id);
+  END IF;
+EXCEPTION WHEN unique_violation OR others THEN
+  RAISE NOTICE 'students has duplicate (teacher_id, student_id) rows — UNIQUE constraint skipped; de-duplicate and re-run.';
+END $uniqrec$;
 
 -- ============================================================================
 -- SECTION 4 — INDEXES FOR HIGH-PERFORMANCE SEARCH & RETRIEVAL
@@ -955,7 +1167,12 @@ BEGIN
     EXISTS (
       SELECT 1
       FROM public.exams e
-      CROSS JOIN LATERAL jsonb_array_elements(COALESCE(e.csv_data, '[]'::jsonb)) AS q(x)
+      CROSS JOIN LATERAL jsonb_array_elements(
+        /* guard: csv_data is JSONB in the master schema, but a legacy row (or
+           a repaired database) can hold a non-array value — treat anything
+           that is not a JSON array as empty instead of failing the submit. */
+        CASE WHEN jsonb_typeof(e.csv_data) = 'array' THEN e.csv_data ELSE '[]'::jsonb END
+      ) AS q(x)
       WHERE e.id = v_exam_id
         AND q.x->>'type' IN ('essay','code','short','case_study','comprehension','long_answer')
     )

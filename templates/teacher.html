@@ -3137,7 +3137,7 @@ function initDashboard(email){
   if(sll)sll.innerText='Last login: '+now;
 
   // Set student URL in settings
-  const baseUrl=window.location.href.replace(/teacher[^/]*\.html.*/i,'student.html');
+  const baseUrl=window.location.href.replace(/[?#].*$/,'').replace(/\/teacher(\.html)?$/i,'/student.html');
   document.getElementById('student-base-url').innerText=baseUrl+'?code=XXXXXX';
 
   // Start inactivity timer
@@ -4632,7 +4632,7 @@ function renderExamList(){
   const efTerm=document.getElementById('ef-term')?.value||'';
   const efType=document.getElementById('ef-type')?.value||'';
   const efStatus=document.getElementById('ef-status')?.value||'';
-  const baseUrl=window.location.href.replace(/teacher[^/]*\.html.*/i,'student.html');
+  const baseUrl=window.location.href.replace(/[?#].*$/,'').replace(/\/teacher(\.html)?$/i,'/student.html');
 
   let list=allExams.filter(e=>{
     const m=decodeMeta(e.subject);
@@ -4730,14 +4730,14 @@ function copyExamCode(code){
 }
 
 function copyExamLink(code){
-  const baseUrl=window.location.href.replace(/teacher[^/]*\.html.*/i,'student.html');
+  const baseUrl=window.location.href.replace(/[?#].*$/,'').replace(/\/teacher(\.html)?$/i,'/student.html');
   navigator.clipboard.writeText(`${baseUrl}?code=${code}`)
     .then(()=>showToast('✅ Exam link copied!'))
     .catch(()=>showToast('Copy failed — try long-pressing the link.'));
 }
 
 function copyStudentInstructions(code){
-  const baseUrl=window.location.href.replace(/teacher[^/]*\.html.*/i,'student.html');
+  const baseUrl=window.location.href.replace(/[?#].*$/,'').replace(/\/teacher(\.html)?$/i,'/student.html');
   const link=`${baseUrl}?code=${code}`;
   const exam=allExams.find(e=>e.code===code);
   let msg='HMG Academy CBT Assessment\n\n';
@@ -4819,7 +4819,7 @@ function exportExamPackage(id){
 }
 
 function printExamAccessSheet(code){
-  const baseUrl=window.location.href.replace(/teacher[^/]*\.html.*/i,'student.html');
+  const baseUrl=window.location.href.replace(/[?#].*$/,'').replace(/\/teacher(\.html)?$/i,'/student.html');
   const link=`${baseUrl}?code=${code}`;
   const exam=allExams.find(e=>e.code===code);
   const m=exam?decodeMeta(exam.subject):{subject:'Assessment',cls:'—',term:'—',type:'—',topic:'—',passmark:50};
@@ -4931,7 +4931,7 @@ function importExamPackage(file){
 }
 
 function shareWhatsApp(code){
-  const baseUrl=window.location.href.replace(/teacher[^/]*\.html.*/i,'student.html');
+  const baseUrl=window.location.href.replace(/[?#].*$/,'').replace(/\/teacher(\.html)?$/i,'/student.html');
   const link=`${baseUrl}?code=${code}`;
   const exam=allExams.find(e=>e.code===code);
   let msg='';
@@ -5183,7 +5183,7 @@ function updateDashboard(){
   if(!live.length){
     liveEl.innerHTML='<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:12px 0;">No exams are currently live.</div>';
   }else{
-    const baseUrl=window.location.href.replace(/teacher[^/]*\.html.*/i,'student.html');
+    const baseUrl=window.location.href.replace(/[?#].*$/,'').replace(/\/teacher(\.html)?$/i,'/student.html');
     liveEl.innerHTML=live.map(e=>{
       const m=decodeMeta(e.subject);
       return`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
@@ -5858,7 +5858,7 @@ function openEditExamModal(id) {
   updateEditExamModeHint();
   
   // Show exam info
-  const baseUrl = window.location.href.replace(/teacher[^/]*\.html.*/i, 'student.html');
+  const baseUrl = window.location.href.replace(/[?#].*$/,'').replace(/\/teacher(\.html)?$/i, '/student.html');
   document.getElementById('edit-ex-code').innerText = exam.code || '';
   document.getElementById('edit-ex-link').innerText = `${baseUrl}?code=${exam.code}`;
   
@@ -6755,7 +6755,7 @@ function renderResults(data){
 function _resultById(id){return allResults.find(r=>String(r.id)===String(id));}
 function _examForResult(r){return allExams.find(e=>e.id===r?.exam_id)||null;}
 function _certCodeForResult(r){return (r?.cert_code||'').trim()||('LOCAL-'+String(r?.id||'').slice(0,8).toUpperCase());}
-function _verificationUrl(code){return window.location.href.replace(/teacher[^/]*\.html.*/i,'certificate.html')+'?code='+encodeURIComponent(code);}
+function _verificationUrl(code){return window.location.href.replace(/[?#].*$/,'').replace(/\/teacher(\.html)?$/i,'/certificate.html')+'?code='+encodeURIComponent(code);}
 function _resultRowsHTML(r){
   const m=decodeMeta(r.exams?.subject||_examForResult(r)?.subject||'');
   const percent=pct(r.score,r.total);

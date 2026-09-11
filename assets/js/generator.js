@@ -235,7 +235,7 @@ const CBTGenerator = {
       'SUPABASE_FREE_TIER_PROTECTION.md', 'GOOGLE_DRIVE_BACKUP.md', 'LICENSE', 'llms.txt',
       'database/README.md', 'FIXES_APPLIED.md', 'PHASE2_ENHANCEMENTS.md',
       'PHASE3_AUDIT_AND_FIXES.md', 'PHASE4_AUDIT_AND_FIXES.md', 'PHASE5_AUDIT_AND_FIXES.md',
-      'PHASE6_AUDIT_AND_FIXES.md'
+      'PHASE6_AUDIT_AND_FIXES.md', 'PHASE7_AUDIT_AND_FIXES.md'
     ],
     infra: [
       'database/complete-schema.sql', 'database/keep-alive.sql', 'database/security-hardening.sql',
