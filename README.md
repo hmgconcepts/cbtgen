@@ -94,3 +94,13 @@ Requirements:
 ## Licence
 
 See `LICENSE`. Generated client packages carry their own licence terms set in Step 3.
+
+---
+
+## Phase 12 — what client builds do NOT include
+
+Client packages contain the full CBT platform with **complete license enforcement** but **no builder tooling**:
+- No License console (`license.html`) and no Client Monitor (`client-monitor.html`) — clients cannot bypass subscription mode.
+- `save_site_license` / `extend_site_license` RPCs are swapped to a provider-managed denial — renewals are handled by HMG Concepts remotely (hosted registry), instantly, with no site visit.
+- Zero builder-console references in navigation, chatbot, or help — enforced by `applyClientMode()` and verified in the build E2E.
+- Every package still ships the full keep-alive stack (scheduled heartbeat, lock-screen keep-alive, auto-restore) so a client platform never pauses — expired or not — and can always be renewed.

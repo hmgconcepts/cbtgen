@@ -209,9 +209,9 @@ const CBTGenerator = {
     pages: [
       'index.html', 'student.html', 'teacher.html', 'cbt-multi.html', 'cbt-prompts.html', 'question-types.html',
       'admin.html', 'admin-data.html', 'storage.html', 'platform-health.html',
-      'status-manager.html', 'settings.html', 'license.html', 'activity_log.html',
+      'status-manager.html', 'settings.html', 'activity_log.html',
       'certificate.html', 'deployment_validator.html', 'feature_guide.html',
-      'link_checker.html', 'offline.html', 'disaster-recovery.html', 'client-monitor.html'
+      'link_checker.html', 'offline.html', 'disaster-recovery.html'
     ],
     scripts: [
       'assets/js/app.js', 'assets/js/keepalive.js', 'assets/js/site-license.js', 'assets/js/license.js',
@@ -248,6 +248,33 @@ const CBTGenerator = {
       'api/keepalive.js', '.github/workflows/supabase-heartbeat.yml',
       '.github/workflows/supabase-auto-restore.yml', 'supabase/functions/ping/index.ts'
     ]
+  },
+
+  /* ── PHASE 12: CLIENT MODE ──────────────────────────────────────────
+     The generator builds CLIENT packages. Builder-only tooling — the Site
+     License console (license.html) and the Client Monitor
+     (client-monitor.html) — must never ship to clients, so a client can
+     never self-extend or inspect the subscription machinery. The master
+     repo marks those blocks with BUILDER-ONLY markers; this pass strips
+     them. It also swaps the license self-service guard in
+     database/complete-schema.sql: on client deployments the license RPCs
+     permanently refuse local changes — renewals are applied remotely by
+     the provider (HMG Concepts) via the license registry, which always
+     wins. Subscription mode can never be bypassed from inside a client
+     deployment. */
+  applyClientMode(text) {
+    let t = String(text);
+    t = t.replace(/\/\*BUILDER-ONLY\*\/[\s\S]*?\/\*BUILDER-ONLY-END\*\//g, '');
+    t = t.replace(/<!--BUILDER-ONLY-->[\s\S]*?<!--\/BUILDER-ONLY-->/g, '');
+    t = t.replace(
+      /\/\*LICENSE-SELF-SERVICE-GUARD\*\/[\s\S]*?\/\*LICENSE-SELF-SERVICE-GUARD-END\*\//g,
+      "  /* Client deployment: license changes are PROVIDER-MANAGED. Extensions\n" +
+      "     and edits are applied remotely by HMG Concepts via the license\n" +
+      "     registry — never by local self-service, so the subscription model\n" +
+      "     cannot be bypassed on client platforms. */\n" +
+      "  RAISE EXCEPTION 'License changes on this deployment are managed by the platform provider (HMG Concepts). Contact your provider to renew.';"
+    );
+    return t;
   },
 
   /* Files whose absence makes the package BROKEN (vs nice-to-have). */
@@ -584,7 +611,7 @@ Powered by the HMG Academy Ecosystem.
     for (const file of allTextFiles) {
       report(`Packaging ${file}…`);
       try {
-        let text = await this.fetchText(this.TEMPLATE_PREFIX + file);
+        let text = this.applyClientMode(await this.fetchText(this.TEMPLATE_PREFIX + file));
         if (file === 'assets/css/style.css') {
           text = this.applyThemeToCSS(text, cfg) + this.layoutCSS(cfg);
         } else if (file === 'assets/js/app.js') {

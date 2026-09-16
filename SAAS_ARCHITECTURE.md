@@ -97,3 +97,17 @@ Supabase Pro on THEIR project is the upgrade path — their cost, not yours.
   the hard leak-scan fails any build that would ship builder credentials.
 - **Publish → OPEN by default** — the teacher form resets to the recommended
   open default; locked publishing always warns at publish, share and print.
+
+---
+
+## Phase 12 — Client-mode licensing (provider-managed subscriptions)
+
+**Model:** the builder (HMG Concepts) sells platforms on subscription or one-time. Clients must never bypass subscription mode:
+
+- **Templates ship no consoles:** `templates/license.html` and `templates/client-monitor.html` are **deleted**. Client builds contain the full license *engine* (lock screens, banners, heartbeat, registry checks) but **no UI to change a license**.
+- **`applyClientMode()` (generator.js)** runs first in the text pipeline (before branding and the credential leak-scan). It:
+  1. strips every `/*BUILDER-ONLY*/ … /*BUILDER-ONLY-END*/` and `<!--BUILDER-ONLY--> … <!--/BUILDER-ONLY-->` block (master files keep these blocks; templates retain the markers by design — the strip happens at build time);
+  2. swaps `/*LICENSE-SELF-SERVICE-GUARD*/ … /*END*/` blocks in `database/complete-schema.sql` so `save_site_license` / `extend_site_license` `RAISE EXCEPTION 'License changes on this deployment are managed by the platform provider (HMG Concepts). Contact your provider to renew.'`
+- **Renewals are provider-side:** the client's lock screen/banners point to HMG Concepts (WhatsApp · email) — no quick-extend, no self-service. The builder renews by updating the hosted `license-registry.json` or the client's license row directly; the client platform re-checks and unlocks instantly.
+- **Never-pause guarantee:** every client package ships the scheduled heartbeat workflow + lock-screen keep-alive + auto-restore, and the builder's Client Monitor adds a weekly 🫀 **keep-alive sweep** that pings every registered client's `sc_keep_alive` RPC using the Supabase URL + anon key stored in the builder's registry — so expired-but-unrenewed platforms never fall to Supabase's 7-day inactivity pause and can be renewed whenever the client is ready.
+- **Integrity verified in the build E2E:** client ZIPs must contain no `license.html`, no `client-monitor.html`, no BUILDER-ONLY marker text, no builder-console references in the bot/help/nav, provider-managed license RPCs, and no `sw.js` precache entries for the removed pages.
