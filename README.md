@@ -38,7 +38,12 @@ The full CBT system (exactly the contents of `templates/`): the 3-portal homepag
 logins), 20 pages (incl. the dedicated question-types.html reference), multi-subject UTME mode, AI Prompts Studio (24 packs + full
 copy-paste library, no AI API), proctoring & anti-cheat, governance suite
 (backups, Drive sync, disaster recovery, storage, health, roles, audit),
-verifiable certificates, 1,000-student submission resilience, and a
+verifiable certificates, 1,000-student submission resilience, the Phase 10
+enterprise pack (adaptive difficulty, instant-feedback practice mode with
+points & streaks, ExamSoft-style psychometric report, per-candidate extra-time
+accommodations, UTME /400 aggregate scoring, live invigilation monitor, result
+appeals, hideable leaderboard, integrity signals — all rule-based, no AI API;
+see `templates/PHASE10_ENTERPRISE_FEATURES.md`), and a
 `database/` folder whose `complete-schema.sql` is the single, all-inclusive,
 idempotent, run-once setup file. See `templates/README.md` for the platform's
 own documentation.

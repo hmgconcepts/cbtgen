@@ -211,14 +211,14 @@ const CBTGenerator = {
       'admin.html', 'admin-data.html', 'storage.html', 'platform-health.html',
       'status-manager.html', 'settings.html', 'license.html', 'activity_log.html',
       'certificate.html', 'deployment_validator.html', 'feature_guide.html',
-      'link_checker.html', 'offline.html', 'disaster-recovery.html'
+      'link_checker.html', 'offline.html', 'disaster-recovery.html', 'client-monitor.html'
     ],
     scripts: [
       'assets/js/app.js', 'assets/js/keepalive.js', 'assets/js/site-license.js', 'assets/js/license.js',
       'assets/js/security-guard.js', 'assets/js/data-portability.js', 'assets/js/drive-sync.js',
       'assets/js/prompt-studio.js', 'assets/js/cbt-engine.js', 'assets/js/cbt-types.js',
       'assets/js/cbt-exam-kit.js', 'assets/js/cbt-richtext.js', 'assets/js/csv-bridge.js',
-      'assets/js/site-help.js', 'assets/js/chatbot.js', 'sw.js', 'pwa_install_enforcer.js'
+      'assets/js/site-help.js', 'assets/js/chatbot.js', 'assets/js/psychometrics.js', 'sw.js', 'pwa_install_enforcer.js'
     ],
     styles: ['assets/css/style.css'],
     images: [
@@ -228,14 +228,15 @@ const CBTGenerator = {
     data: [
       'PROMPT_TEMPLATE.md',
       'database/sample-question-bank.csv', 'database/students_import_template.csv',
-      'database/further_maths_sample.csv'
+      'database/further_maths_sample.csv', 'database/sample-multi-subject.csv'
     ],
     docs: [
       'README.md', 'DEPLOYMENT.md', 'FEATURES.md', 'SECURITY.md', 'ANTI_CHEAT_CONFIG_GUIDE.md',
       'SUPABASE_FREE_TIER_PROTECTION.md', 'GOOGLE_DRIVE_BACKUP.md', 'LICENSE', 'llms.txt',
       'database/README.md', 'FIXES_APPLIED.md', 'PHASE2_ENHANCEMENTS.md',
       'PHASE3_AUDIT_AND_FIXES.md', 'PHASE4_AUDIT_AND_FIXES.md', 'PHASE5_AUDIT_AND_FIXES.md',
-      'PHASE6_AUDIT_AND_FIXES.md', 'PHASE7_AUDIT_AND_FIXES.md'
+      'PHASE6_AUDIT_AND_FIXES.md', 'PHASE7_AUDIT_AND_FIXES.md', 'PHASE8_AUDIT_AND_FIXES.md',
+      'PHASE9_AUDIT_AND_FIXES.md', 'PHASE10_ENTERPRISE_FEATURES.md'
     ],
     infra: [
       'database/complete-schema.sql', 'database/keep-alive.sql', 'database/security-hardening.sql',
