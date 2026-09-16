@@ -236,7 +236,8 @@ const CBTGenerator = {
       'database/README.md', 'FIXES_APPLIED.md', 'PHASE2_ENHANCEMENTS.md',
       'PHASE3_AUDIT_AND_FIXES.md', 'PHASE4_AUDIT_AND_FIXES.md', 'PHASE5_AUDIT_AND_FIXES.md',
       'PHASE6_AUDIT_AND_FIXES.md', 'PHASE7_AUDIT_AND_FIXES.md', 'PHASE8_AUDIT_AND_FIXES.md',
-      'PHASE9_AUDIT_AND_FIXES.md', 'PHASE10_ENTERPRISE_FEATURES.md', 'PHASE10B_EXAM_REACHABILITY_HOTFIX.md'
+      'PHASE9_AUDIT_AND_FIXES.md', 'PHASE10_ENTERPRISE_FEATURES.md', 'PHASE10B_EXAM_REACHABILITY_HOTFIX.md',
+      'PHASE11_WIRING_AND_COMPLIANCE_AUDIT.md'
     ],
     infra: [
       'database/complete-schema.sql', 'database/keep-alive.sql', 'database/security-hardening.sql',

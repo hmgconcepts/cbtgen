@@ -2,8 +2,8 @@
    app.js — HMG CBT Pro Core Application Layer & Global Helpers
    ==================================================================== */
 const App = {
-  SB_URL: 'https://pstnsaqjshmtintjrnas.supabase.co',
-  SB_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdG5zYXFqc2htdGludGpybmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDEzODUsImV4cCI6MjA5MTI3NzM4NX0.KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w',
+  SB_URL: '__CLIENT_SUPABASE_URL__',
+  SB_KEY: '__CLIENT_SUPABASE_KEY__',
   user: null,
   profile: null,
   institution: null,
@@ -120,12 +120,39 @@ const App = {
     this.showToast(`Switched to ${cur} theme`);
   },
 
-  /* ── Session & Auth ── */
+  /* ── Session & Auth ──
+     PHASE 11 WIRING FIX: teacher.html has always stored its session under
+     'cbt_pro_session', but getSession() only read 'cbt_session' /
+     'cbt_teacher_session' / 'cbt_admin_session' — so every page relying on
+     App (multi-subject builder, settings, license, status manager, client
+     monitor) could not see a signed-in teacher. getSession() now reads the
+     teacher key too, and role-aware getters let each page demand exactly
+     the persona it needs:
+       getTeacherSession() — teacher portal sessions only (exam ownership)
+       getAdminSession()   — admin panel sessions only
+       getBestSession()    — admin preferred, else teacher (governance pages
+                             that derive rights from the profile role)     */
   getSession() {
     try {
-      const raw = localStorage.getItem('cbt_session') || localStorage.getItem('cbt_teacher_session') || localStorage.getItem('cbt_admin_session');
+      const raw = localStorage.getItem('cbt_session') || localStorage.getItem('cbt_teacher_session')
+        || localStorage.getItem('cbt_pro_session') || localStorage.getItem('cbt_admin_session');
       return raw ? JSON.parse(raw) : null;
     } catch (_) { return null; }
+  },
+  getTeacherSession() {
+    try {
+      const raw = localStorage.getItem('cbt_session') || localStorage.getItem('cbt_teacher_session') || localStorage.getItem('cbt_pro_session');
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) { return null; }
+  },
+  getAdminSession() {
+    try {
+      const raw = localStorage.getItem('cbt_admin_session');
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) { return null; }
+  },
+  getBestSession() {
+    return this.getAdminSession() || this.getTeacherSession() || this.getSession();
   },
   setSession(sessionData) {
     if (sessionData) {
@@ -134,6 +161,7 @@ const App = {
     } else {
       localStorage.removeItem('cbt_session');
       localStorage.removeItem('cbt_teacher_session');
+      localStorage.removeItem('cbt_pro_session');
       localStorage.removeItem('cbt_admin_session');
       this.user = null;
       this.profile = null;

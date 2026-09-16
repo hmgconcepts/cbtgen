@@ -47,10 +47,25 @@ see `templates/PHASE10_ENTERPRISE_FEATURES.md`), the Phase 10B exam-reachability
 hotfix (open-by-default publish reset, persistent "database out of date" banner
 for teachers, actionable student messages when the database lags the site, and
 a live schema probe in the deployment validator; see
-`templates/PHASE10B_EXAM_REACHABILITY_HOTFIX.md`), and a
+`templates/PHASE10B_EXAM_REACHABILITY_HOTFIX.md`), the Phase 11 wiring audit
+(role-aware cross-page sessions so tool pages always see the signed-in teacher,
+complete navigation panes listing every page, and 📄 Paper Exam Export —
+print-ready question paper + confidential answer key + OMR bubble sheet from
+any exam; see `templates/PHASE11_WIRING_AND_COMPLIANCE_AUDIT.md`), and a
 `database/` folder whose `complete-schema.sql` is the single, all-inclusive,
 idempotent, run-once setup file. See `templates/README.md` for the platform's
 own documentation.
+
+## Full-stack & SaaS architecture
+
+Every generated platform is FULL-STACK on 100% free tiers: PWA front-end on a
+CDN + Supabase Auth (roles/approvals) + Postgres with row-level security +
+45 server-side RPCs + Storage vault + GitHub Actions heartbeat + Edge
+Function. SaaS primitives ship built in: multi-role tenancy, subscription
+licensing with a remote registry, audit trails, and a Client Monitor for the
+builder. Scaling model: a **SaaS factory** — one generator run = one branded,
+isolated, licensed client platform. Full architecture map, economics and
+scaling guide: **`SAAS_ARCHITECTURE.md`** (this folder).
 
 ## Deploying the generator
 
