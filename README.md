@@ -43,7 +43,11 @@ enterprise pack (adaptive difficulty, instant-feedback practice mode with
 points & streaks, ExamSoft-style psychometric report, per-candidate extra-time
 accommodations, UTME /400 aggregate scoring, live invigilation monitor, result
 appeals, hideable leaderboard, integrity signals — all rule-based, no AI API;
-see `templates/PHASE10_ENTERPRISE_FEATURES.md`), and a
+see `templates/PHASE10_ENTERPRISE_FEATURES.md`), the Phase 10B exam-reachability
+hotfix (open-by-default publish reset, persistent "database out of date" banner
+for teachers, actionable student messages when the database lags the site, and
+a live schema probe in the deployment validator; see
+`templates/PHASE10B_EXAM_REACHABILITY_HOTFIX.md`), and a
 `database/` folder whose `complete-schema.sql` is the single, all-inclusive,
 idempotent, run-once setup file. See `templates/README.md` for the platform's
 own documentation.
