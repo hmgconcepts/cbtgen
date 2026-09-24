@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# The generator is a public static tool — every page may be crawled.
+# Templates are packaged client-side; nothing dynamic to exclude except token URLs.
+Disallow: /*?access_token=
+Disallow: /*?refresh_token=
+
+Sitemap: https://cbtgen.vercel.app/sitemap.xml

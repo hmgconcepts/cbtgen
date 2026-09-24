@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT System Generator • Build Your Client's Branded CBT Platform</title>
+<meta name="description" content="Configure and generate a complete branded CBT platform for a school: identity, theme, font, layout, Supabase backend, license model — then download a verified deploy-ready ZIP.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://cbtgen.vercel.app/generator.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CBT System Generator — HMG Concepts">
+<meta property="og:title" content="CBT System Generator — 4-Step Wizard">
+<meta property="og:description" content="Brand, configure and package a complete CBT platform for any school — verified ZIP download.">
+<meta property="og:url" content="https://cbtgen.vercel.app/generator.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="templates/assets/img/hmg-academy-logo.png">
+<link rel="stylesheet" href="templates/assets/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  .step{display:none;}
+  .step.active{display:block;}
+  .steps-bar{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+  .steps-bar .s{flex:1;min-width:120px;text-align:center;padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);font-size:12px;font-weight:700;cursor:pointer;color:var(--text-muted);}
+  .steps-bar .s.active{border-color:var(--primary);color:var(--primary);box-shadow:0 0 0 2px var(--primary-dim);}
+  .steps-bar .s.done{color:var(--primary);border-color:var(--primary);}
+  .theme-card{border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;transition:.15s;}
+  .theme-card:hover{border-color:var(--primary);}
+  .theme-card.active{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-dim);}
+  .swatch{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:4px;vertical-align:-2px;}
+  .code-chip{font-family:ui-monospace,Consolas,monospace;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:1px 6px;font-size:11px;word-break:break-all;}
+  .file-list{columns:2;column-gap:18px;font-size:11.5px;color:var(--text-muted);}
+  @media (max-width:720px){.file-list{columns:1;}}
+</style>
+<script>
+/* Self-contained toast — the wizard deliberately ships without the CBT
+   platform's app.js (this is the GENERATOR product, not the exam platform). */
+function showToast(msg, type, ms){
+  type = type || 'info';
+  let t = document.getElementById('gen-toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'gen-toast';
+    t.style.cssText = 'position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:99999;max-width:92vw;padding:12px 20px;border-radius:12px;font-size:13.5px;font-weight:700;font-family:system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:opacity .25s;opacity:0;';
+    document.body.appendChild(t);
+  }
+  const styles = {
+    success: 'background:#065f46;color:#ecfdf5;border:1px solid #10b981;',
+    danger:  'background:#7f1d1d;color:#fef2f2;border:1px solid #ef4444;',
+    warning: 'background:#78350f;color:#fffbeb;border:1px solid #f59e0b;',
+    info:    'background:#1e3a5f;color:#eff6ff;border:1px solid #3b82f6;'
+  };
+  t.style.cssText += styles[type] || styles.info;
+  t.innerText = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>{ t.style.opacity='0'; }, ms || 4500);
+}
+</script>
+</head>
+<body>
+<header class="app-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand-group">
+      <img src="templates/assets/img/hmg-academy-logo.png" alt="Logo" class="brand-logo">
+      <div>
+        <div class="brand-title">CBT System Generator</div>
+        <div class="brand-sub">Whitelabel platform builder — a separate HMG Concepts product</div>
+      </div>
+    </a>
+    <nav class="nav-links" id="main-nav">
+      <a href="index.html">Home</a>
+      <a href="generator.html" class="nav-cta-btn">⚙️ Open Generator</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main-wrap">
+  <div class="card-title-row">
+    <div>
+      <h1>⚙️ Whitelabel CBT System Generator</h1>
+      <p>Build a complete, branded CBT platform for any client in 4 steps — <b>50 professional themes</b>, <b>50 professional font stacks</b>, <b>50 layouts</b>, baked Supabase credentials, license model and free-tier protection. The output is a deploy-ready ZIP with <b>every file needed</b>, self-verified before download.</p>
+    </div>
+  </div>
+
+  <div class="steps-bar">
+    <div class="s active" id="tab-1" onclick="goStep(1)">1 🎨 Brand &amp; Identity</div>
+    <div class="s" id="tab-2" onclick="goStep(2)">2 🖌️ Theme &amp; Typography</div>
+    <div class="s" id="tab-3" onclick="goStep(3)">3 🔌 Backend &amp; License</div>
+    <div class="s" id="tab-4" onclick="goStep(4)">4 👁️ Preview &amp; Download</div>
+  </div>
+
+  <!-- ═══════════ STEP 1: BRAND ═══════════ -->
+  <div class="step active" id="step-1">
+    <div class="grid-2">
+      <div class="card">
+        <h2>🏫 Institution identity</h2>
+        <label>School / Institution Name *</label>
+        <input type="text" id="gen-name" value="God of Seed Academy CBT" oninput="updatePreview()">
+
+        <label>Platform Tagline / Slogan</label>
+        <input type="text" id="gen-tagline" value="Excellence in Computer-Based Testing &amp; STEM Practice" oninput="updatePreview()">
+
+        <div class="grid-2">
+          <div>
+            <label>Support Email (shown to client)</label>
+            <input type="email" id="gen-email" value="hismarvellousgrace@gmail.com">
+          </div>
+          <div>
+            <label>Support Phone</label>
+            <input type="text" id="gen-phone" value="+234 810 086 6322">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label>Default Passmark (%)</label>
+            <input type="number" id="gen-passmark" min="1" max="100" value="50">
+          </div>
+          <div>
+            <label>Google Drive Client ID (optional now)</label>
+            <input type="text" id="gen-drive" placeholder="…apps.googleusercontent.com">
+          </div>
+        </div>
+        <p style="font-size:.78rem;color:var(--text-muted);">The Drive Client ID can also be pasted later inside the generated platform (Settings → Google Drive Cloud Sync). Remember to add the client's deployed URL to the Client ID's <i>Authorized JavaScript origins</i> in Google Cloud Console.</p>
+      </div>
+
+      <div class="card">
+        <h2>✅ What the client receives</h2>
+        <div style="font-size:12.5px;line-height:1.8;">
+          • Complete static platform — <b>20 pages</b>, zero build tools, zero servers<br>
+          • 3 portals (student / teacher / admin) + Multi-Subject CBT + Prompt Studio<br>
+          • 20 question types, proctoring &amp; anti-cheat, certificates + verifier<br>
+          • Settings console · Admin Data · Storage Manager · Platform Health<br>
+          • Roles &amp; Status manager · Audit log · dual-engine Site License<br>
+          • <b>COMPLETE_SCHEMA_SQL.sql</b> — run once, everything installed<br>
+          • 10-layer Supabase free-tier protection (workflows + edge function + docs)<br>
+          • Google Drive backup &amp; sync, disaster-recovery migration<br>
+          • START-HERE.md quick-start written for this exact client
+        </div>
+      </div>
+    </div>
+    <div class="flex-gap" style="margin-top:16px;justify-content:flex-end;">
+      <button class="btn btn-primary" onclick="goStep(2)">Next: Theme &amp; Typography →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ STEP 2: THEME ═══════════ -->
+  <div class="step" id="step-2">
+    <div class="grid-2">
+      <div class="card">
+        <h2>🖌️ Theme preset (50+ curated palettes)</h2>
+        <div id="theme-grid" class="grid-3" style="max-height:340px;overflow-y:auto;"></div>
+        <h2 style="margin-top:18px;">🎨 Custom colours</h2>
+        <div class="grid-2">
+          <div>
+            <label>Primary Brand Colour</label>
+            <input type="color" id="gen-color-primary" value="#10b981" oninput="updatePreview()" style="height:45px;padding:4px;cursor:pointer;width:100%;">
+          </div>
+          <div>
+            <label>Accent Brand Colour</label>
+            <input type="color" id="gen-color-accent" value="#8b5cf6" oninput="updatePreview()" style="height:45px;padding:4px;cursor:pointer;width:100%;">
+          </div>
+        </div>
+        <p style="font-size:.78rem;color:var(--text-muted);">Picking a preset fills the colours; you can then fine-tune. The generator rewrites the CSS custom properties (<span class="code-chip">--primary --accent --bg --surface</span>) so the theme genuinely applies to every page.</p>
+      </div>
+      <div class="card">
+        <h2>🔤 Typography &amp; layout</h2>
+        <label>Font Stack (50+ options)</label>
+        <select id="gen-font-select" onchange="updatePreview()"></select>
+        <label>Interface Layout Style (50 layouts)</label>
+        <select id="gen-layout-select" onchange="updatePreview()"></select>
+        <div style="margin-top:14px;padding:14px;border-radius:10px;border:1px dashed var(--border-light);background:var(--bg);" id="font-sample">
+          <div style="font-size:11px;color:var(--text-muted);">Sample rendering</div>
+          <div id="font-sample-text" style="font-size:17px;margin-top:4px;">The quick brown fox jumps over 2,468 lazy dogs. ₦ π H₂O √16</div>
+        </div>
+      </div>
+    </div>
+    <div class="flex-gap" style="margin-top:16px;justify-content:space-between;">
+      <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Next: Backend &amp; License →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ STEP 3: BACKEND & LICENSE ═══════════ -->
+  <div class="step" id="step-3">
+    <div class="grid-2">
+      <div class="card">
+        <h2>🔌 Supabase backend injection</h2>
+        <p style="font-size:.85rem;color:var(--text-muted);">These credentials are baked into every generated file. Use the client's OWN project (each school needs its own free project — or they all share your data).</p>
+        <label>Supabase Project URL *</label>
+        <input type="text" id="gen-sb-url" placeholder="https://YOUR-CLIENT-PROJECT.supabase.co" autocomplete="off" spellcheck="false">
+        <label>Supabase Public Anon Key *</label>
+        <textarea id="gen-sb-key" rows="3" placeholder="Paste the CLIENT'S public anon key (starts with eyJ…)" style="font-family:ui-monospace,Consolas,monospace;font-size:11px;" autocomplete="off" spellcheck="false"></textarea>
+        <button class="btn btn-sm btn-outline" onclick="testSupabase()">⚡ Test Connection</button>
+        <span id="gen-sb-test" style="font-size:12px;margin-left:8px;"></span>
+        <p style="font-size:.78rem;color:var(--danger);margin-top:8px;">⚠️ ONLY the anon/public key — the service_role key bypasses all security and must never ship to a browser.</p>
+      </div>
+      <div class="card" style="margin-top:14px;">
+        <h2>🌐 Deployment URL (optional — powers search-engine indexing)</h2>
+        <input type="text" id="gen-deploy-url" placeholder="https://client-school.vercel.app">
+        <p style="font-size:12.5px;color:var(--text-muted);margin-top:6px;line-height:1.55;">If you already know where the platform will live (e.g. <code>https://my-school.vercel.app</code>), enter it — the sitemap, canonical tags and social-share tags will point there so Google, Bing and Yahoo can index your client's platform from day one. Leave blank and the package ships with domain-agnostic relative URLs plus a one-line fix explained in <b>DEPLOYMENT.md</b>.</p>
+        <p style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">If you already know where the client's platform will live (Vercel / GitHub Pages URL), enter it — the generated <b>sitemap.xml</b> and <b>robots.txt</b> are then pointed at that address. Leave empty to keep the placeholders; they still work after the client deploys.</p>
+      </div>
+      <div class="card">
+        <h2>📜 License model for this client</h2>
+        <div class="grid-2">
+          <div>
+            <label>Model</label>
+            <select id="gen-lic-model" onchange="updatePreview()">
+              <option value="lifetime">Lifetime (one-time purchase)</option>
+              <option value="subscription">Subscription (billed)</option>
+            </select>
+          </div>
+          <div>
+            <label>Billing cycle</label>
+            <select id="gen-lic-cycle"><option value="monthly">Monthly</option><option value="termly" selected>Termly</option><option value="annual">Annual</option><option value="custom">Custom</option></select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div><label>Expires on (subscriptions)</label><input type="date" id="gen-lic-expires"></div>
+          <div><label>Grace days after expiry</label><input type="number" id="gen-lic-grace" min="0" max="90" value="7"></div>
+        </div>
+        <label>License registry URL (optional, authoritative remote JSON)</label>
+        <input type="url" id="gen-lic-registry" placeholder="https://hmgconcepts.pages.dev/licenses.json">
+        <label>License salt (tamper-evidence signature)</label>
+        <input type="text" id="gen-lic-salt" value="HMG_CBT_PRO_V10_SECURE_SALT_2026">
+        <p style="font-size:.78rem;color:var(--text-muted);">The model is baked into the package (<span class="code-chip">window.CBT_LICENSE</span> in app.js) AND seeded in the database. The proprietor can change it any time from the License page — quick-extend buttons included.</p>
+      </div>
+    </div>
+    <div class="flex-gap" style="margin-top:16px;justify-content:space-between;">
+      <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(4)">Next: Preview &amp; Download →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ STEP 4: PREVIEW & DOWNLOAD ═══════════ -->
+  <div class="step" id="step-4">
+    <div class="grid-2">
+      <div class="card">
+        <h2>👁️ Live whitelabel preview</h2>
+        <div id="preview-panel" style="border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;box-shadow:var(--shadow);">
+          <div style="font-size:40px;margin-bottom:8px;">🎓</div>
+          <h2 id="prev-name" style="margin-bottom:4px;">—</h2>
+          <p id="prev-tagline" style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">—</p>
+          <div class="flex-gap" style="justify-content:center;margin-bottom:18px;">
+            <span class="badge" id="prev-badge-primary" style="color:#000;">Primary Action</span>
+            <span class="badge" id="prev-badge-accent" style="color:#fff;">Secondary Accent</span>
+            <span class="badge badge-info" id="prev-badge-layout">Layout</span>
+            <span class="badge" id="prev-badge-license">License</span>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:left;font-size:12px;line-height:1.7;">
+            <strong style="color:var(--primary);">Package contents (verified before download):</strong><br>
+            • 20 pages · 17 JS modules · themed CSS · logos &amp; sample assets<br>
+            • PWA branded to the client (name, icon colours, unique offline cache)<br>
+            • sitemap.xml / robots.txt rebased to the client's URL when provided<br>
+            • <span class="code-chip">COMPLETE_SCHEMA_SQL.sql</span> (10 tables, 40+ RPCs, RLS, archive vault, pg_cron)<br>
+            • <span class="code-chip">.github/workflows/</span> heartbeat (self-committing) + auto-restore watchdog<br>
+            • <span class="code-chip">api/keepalive.js</span> + <span class="code-chip">supabase/functions/ping</span> + protection docs<br>
+            • <span class="code-chip">START-HERE.md</span> written for this client
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>📦 Generate &amp; download</h2>
+        <p style="font-size:.85rem;color:var(--text-muted);">The generator fetches every file from this deployment, applies branding (name, tagline, colours, font, Supabase credentials, license model), compresses in-browser, then <b>re-opens the ZIP and verifies every expected file is inside</b> before downloading. Critical files missing → the download is refused with an honest error.</p>
+        <div id="gen-progress" style="display:none;font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin:10px 0;max-height:180px;overflow-y:auto;"></div>
+        <button class="btn btn-primary btn-lg" style="width:100%;" id="gen-btn" onclick="generateCustomCBTZip()">📦 Download Customized CBT System (.ZIP)</button>
+        <div id="gen-result" style="margin-top:12px;"></div>
+        <details style="margin-top:12px;">
+          <summary style="cursor:pointer;font-size:12.5px;color:var(--text-muted);">Full file manifest</summary>
+          <div class="file-list" id="manifest-list" style="margin-top:8px;"></div>
+        </details>
+      </div>
+    </div>
+    <div class="flex-gap" style="margin-top:16px;">
+      <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+    </div>
+  </div>
+</main>
+
+<footer class="app-footer">
+  HMG Academy CBT Pro Enterprise · Built with Free-Tier Resilient Architecture · HMG Concepts
+</footer>
+
+<script src="assets/js/generator.js"></script>
+<script>
+let currentStep = 1;
+
+function goStep(n) {
+  currentStep = n;
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('step-' + i).classList.toggle('active', i === n);
+    const tab = document.getElementById('tab-' + i);
+    tab.classList.toggle('active', i === n);
+    tab.classList.toggle('done', i < n);
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (n === 4) updatePreview();
+}
+
+function populateDropdowns() {
+  const tSel = document.getElementById('gen-font-select');
+  tSel.innerHTML = CBTGenerator.FONTS.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+
+  const lSel = document.getElementById('gen-layout-select');
+  lSel.innerHTML = CBTGenerator.LAYOUTS.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+
+  // Visual theme cards
+  const grid = document.getElementById('theme-grid');
+  grid.innerHTML = CBTGenerator.THEMES.map((t, i) => `
+    <div class="theme-card ${i === 0 ? 'active' : ''}" id="tc-${t.id}" onclick="pickTheme('${t.id}')" title="${t.name}">
+      <div style="font-size:11px;font-weight:700;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</div>
+      <span class="swatch" style="background:${t.primary}"></span><span class="swatch" style="background:${t.accent}"></span><span class="swatch" style="background:${t.bg};border:1px solid var(--border);"></span><span class="swatch" style="background:${t.surface};border:1px solid var(--border);"></span>
+    </div>`).join('');
+
+  const mf = [...new Set(Object.values(CBTGenerator.MANIFEST).flat())].sort();
+  document.getElementById('manifest-list').innerHTML = mf.map(f => '📄 ' + f).join('<br>') + '<br>📄 START-HERE.md <i>(generated)</i>';
+}
+
+let selectedTheme = 'emerald-elegance';
+function pickTheme(id) {
+  selectedTheme = id;
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById('tc-' + id);
+  if (card) card.classList.add('active');
+  const theme = CBTGenerator.THEMES.find(t => t.id === id);
+  if (theme) {
+    document.getElementById('gen-color-primary').value = theme.primary;
+    document.getElementById('gen-color-accent').value = theme.accent;
+  }
+  updatePreview();
+}
+
+function updatePreview() {
+  const name = document.getElementById('gen-name').value.trim() || 'Custom CBT Pro';
+  const tagline = document.getElementById('gen-tagline').value.trim() || 'Computer-Based Testing System';
+  const pCol = document.getElementById('gen-color-primary').value;
+  const aCol = document.getElementById('gen-color-accent').value;
+  const lid = document.getElementById('gen-layout-select').value;
+  const layout = CBTGenerator.LAYOUTS.find(l => l.id === lid);
+  const font = CBTGenerator.FONTS.find(f => f.id === document.getElementById('gen-font-select').value);
+
+  document.getElementById('prev-name').innerText = name;
+  document.getElementById('prev-tagline').innerText = tagline;
+  const bp = document.getElementById('prev-badge-primary');
+  bp.style.background = pCol;
+  const isLight = l => ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e'].includes(String(l).toLowerCase());
+  bp.style.color = isLight(pCol[5]) ? '#000' : '#fff';
+  document.getElementById('prev-badge-accent').style.background = aCol;
+  document.getElementById('prev-badge-layout').innerText = layout ? layout.name.split(' ')[0] : 'Standard';
+  document.getElementById('prev-badge-license').innerText = document.getElementById('gen-lic-model').value === 'subscription' ? 'Subscription' : 'Lifetime';
+  if (font) {
+    document.getElementById('preview-panel').style.fontFamily = font.family;
+    document.getElementById('font-sample-text').style.fontFamily = font.family;
+  }
+}
+
+async function testSupabase() {
+  const url = document.getElementById('gen-sb-url').value.trim();
+  const key = document.getElementById('gen-sb-key').value.trim();
+  const stat = document.getElementById('gen-sb-test');
+  stat.textContent = '⏳ testing…';
+  try {
+    const r = await fetch(`${url}/rest/v1/institutions?select=id&limit=1`, { headers: { apikey: key, Authorization: `Bearer ${key}` } });
+    if (r.ok) { stat.innerHTML = '✅ verified'; stat.style.color = 'var(--primary)'; }
+    else { stat.innerHTML = `⚠️ HTTP ${r.status} (schema not installed? run COMPLETE_SCHEMA_SQL.sql)`; stat.style.color = 'var(--warning)'; }
+  } catch (e) { stat.innerHTML = '❌ ' + (e.message || 'failed'); stat.style.color = 'var(--danger)'; }
+}
+
+function readConfig() {
+  return {
+    institutionName: document.getElementById('gen-name').value.trim(),
+    tagline: document.getElementById('gen-tagline').value.trim(),
+    themeId: selectedTheme,
+    fontId: document.getElementById('gen-font-select').value,
+    layoutId: document.getElementById('gen-layout-select').value,
+    primaryColor: document.getElementById('gen-color-primary').value,
+    accentColor: document.getElementById('gen-color-accent').value,
+    supabaseUrl: document.getElementById('gen-sb-url').value.trim(),
+    supabaseAnonKey: document.getElementById('gen-sb-key').value.trim(),
+    deployUrl: (document.getElementById('gen-deploy-url')?.value || '').trim(),
+    driveClientId: document.getElementById('gen-drive').value.trim(),
+    supportEmail: document.getElementById('gen-email').value.trim(),
+    supportPhone: document.getElementById('gen-phone').value.trim(),
+    defaultPassmark: +document.getElementById('gen-passmark').value || 50,
+    licenseModel: document.getElementById('gen-lic-model').value,
+    licenseCycle: document.getElementById('gen-lic-cycle').value,
+    licenseExpires: document.getElementById('gen-lic-expires').value,
+    licenseGraceDays: +document.getElementById('gen-lic-grace').value || 7,
+    licenseRegistryUrl: document.getElementById('gen-lic-registry').value.trim(),
+    licenseSalt: document.getElementById('gen-lic-salt').value.trim() || 'HMG_CBT_PRO_V10_SECURE_SALT_2026'
+  };
+}
+
+async function generateCustomCBTZip() {
+  const btn = document.getElementById('gen-btn');
+  const prog = document.getElementById('gen-progress');
+  const out = document.getElementById('gen-result');
+  btn.disabled = true;
+  prog.style.display = 'block';
+  prog.innerHTML = '';
+  const log = m => { prog.innerHTML += '· ' + escapeHtml(m) + '<br>'; prog.scrollTop = prog.scrollHeight; };
+  try {
+    const cfg = readConfig();
+    const res = await CBTGenerator.generatePackage(cfg, log);
+    out.innerHTML = `
+      <div style="background:var(--primary-dim);border:1px solid var(--primary);border-radius:10px;padding:14px;">
+        <strong style="color:var(--primary);">✅ ${escapeHtml(res.filename)} downloaded</strong>
+        (${(res.sizeBytes / 1048576).toFixed(2)} MB · ${res.filesIncluded} files · integrity verified ✓)<br>
+        <span style="font-size:12px;color:var(--text-muted);">Next: unzip → create a free Supabase project → run COMPLETE_SCHEMA_SQL.sql once → push the folder to a GitHub repo → import into Vercel (or publish with GitHub Pages). Full steps are in START-HERE.md inside the ZIP.</span>
+        ${res.missingNonCritical.length ? `<div style="font-size:12px;color:var(--warning);margin-top:6px;">⚠️ ${res.missingNonCritical.length} optional file(s) not found on this deployment: ${res.missingNonCritical.map(m => escapeHtml(m.file)).join(', ')} — everything critical verified.</div>` : ''}
+      </div>`;
+    showToast(`Generated ${res.filename} — verified ✓`, 'success', 6000);
+  } catch (e) {
+    out.innerHTML = `<div style="background:var(--danger-dim);border:1px solid var(--danger);border-radius:10px;padding:14px;"><strong style="color:var(--danger);">❌ Packaging stopped:</strong> ${escapeHtml(e.message)}</div>`;
+    showToast('Packaging error: ' + (e.message || e), 'danger', 7000);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  populateDropdowns();
+  updatePreview();
+});
+</script>
+</body>
+</html>

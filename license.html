@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site License & Subscription — HMG CBT Builder Console</title>
+  <meta name="description" content="Builder console: manage site licenses and subscriptions for every generated HMG CBT client platform — activate keys, monitor usage, control expiry and feature gates.">
+<link rel="icon" href="assets/img/hmg-academy-logo.png">
+<link rel="stylesheet" href="assets/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  .code-chip{font-family:ui-monospace,Consolas,monospace;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:1px 6px;font-size:11px;word-break:break-all;}
+  .state-badge{font-size:13px;font-weight:800;padding:6px 16px;border-radius:20px;display:inline-block;}
+  .st-lifetime{background:var(--primary-dim);color:var(--primary);border:1px solid var(--primary);}
+  .st-active{background:var(--primary-dim);color:var(--primary);border:1px solid var(--primary);}
+  .st-warning{background:var(--warning-dim);color:var(--warning);border:1px solid var(--warning);}
+  .st-grace,.st-expired,.st-suspended{background:var(--danger-dim);color:var(--danger);border:1px solid var(--danger);}
+  .kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;gap:12px;}
+  .kv:last-child{border-bottom:none;}
+</style>
+</head>
+<body>
+<div style="display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid #e5e7eb;background:#0f172a;color:#fff;flex-wrap:wrap;">
+  <a href="generator.html" style="color:#fff;text-decoration:none;font-weight:800;">🛠️ HMG CBT Generator — Builder Console</a>
+  <span style="opacity:.6">·</span>
+  <a href="license.html" style="color:#93c5fd;text-decoration:none;font-size:13px;">📜 License Console</a>
+  <a href="client-monitor.html" style="color:#93c5fd;text-decoration:none;font-size:13px;">📡 Client Monitor</a>
+  <a href="generator.html" style="color:#93c5fd;text-decoration:none;font-size:13px;">🏭 Build a Client Site</a>
+  <span style="margin-left:auto;font-size:11.5px;opacity:.7;">HMG Concepts internal tooling — never shipped to client platforms</span>
+</div>
+<header class="app-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand-group">
+      <img src="assets/img/hmg-academy-logo.png" alt="Logo" class="brand-logo">
+      <div>
+        <div class="brand-title">HMG Academy CBT Pro</div>
+        <div class="brand-sub">Site License & Subscription</div>
+      </div>
+    </a>
+    <nav class="nav-links" id="main-nav"></nav>
+  </div>
+</header>
+
+<main class="main-wrap">
+  <div class="card-title-row">
+    <div>
+      <h1>📜 Site License & Subscription</h1>
+      <p>Dual-engine licensing: an <b>offline perpetual token</b> (cryptographic, no phone-home) and a <b>subscription lifecycle</b> (lifetime or billed cycles with grace days). The subscription state is re-evaluated on every page, re-checked every 15 minutes, and after expiry + grace it locks the portal with a renewal screen.</p>
+    </div>
+    <div class="flex-gap">
+      <span class="badge" id="role-badge">Checking role…</span>
+      <button class="btn btn-outline" onclick="window.print()">🖨 Print Certificate</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ LIVE STATE ═══════════ -->
+  <div class="card" style="border:2px solid var(--primary);padding:30px;text-align:center;background:radial-gradient(circle at center, rgba(16,185,129,0.07), transparent 70%), var(--surface);">
+    <img src="assets/img/hmg-academy-logo.png" alt="Logo" style="width:64px;height:64px;border-radius:16px;margin-bottom:10px;">
+    <div><span class="state-badge" id="live-state">…</span></div>
+    <h1 id="lic-inst-name" style="font-size:26px;margin:12px 0 4px;">HMG Academy CBT Pro</h1>
+    <p id="lic-plan" style="color:var(--primary);font-weight:700;margin:0 0 18px;">—</p>
+    <div class="grid-4" style="text-align:left;">
+      <div class="stat-box"><div class="stat-lbl">Model</div><strong id="kv-model" style="font-size:13.5px;">—</strong></div>
+      <div class="stat-box"><div class="stat-lbl">Expires</div><strong id="kv-expires" style="font-size:13.5px;">—</strong></div>
+      <div class="stat-box"><div class="stat-lbl">Grace Days</div><strong id="kv-grace" style="font-size:13.5px;">—</strong></div>
+      <div class="stat-box"><div class="stat-lbl">Source</div><strong id="kv-source" style="font-size:13.5px;">—</strong></div>
+    </div>
+    <p id="state-note" style="font-size:13px;color:var(--text-muted);max-width:640px;margin:14px auto 0;"></p>
+  </div>
+
+  <div class="grid-2">
+    <!-- ═══════════ SUBSCRIPTION MANAGER ═══════════ -->
+    <div class="card">
+      <h2>🔑 Subscription Manager <span class="badge badge-info">super_admin only</span></h2>
+      <p style="font-size:.85rem;color:var(--text-muted);">Proprietor/owner console. Changes are written through the owner-checked <span class="code-chip">save_site_license()</span> RPC, signed for tamper evidence, and audit-logged.</p>
+
+      <label>Model</label>
+      <select id="sub-model">
+        <option value="lifetime">Lifetime (one-time purchase — never locks)</option>
+        <option value="subscription">Subscription (billed per cycle)</option>
+      </select>
+
+      <div id="sub-cycle-box">
+        <label>Billing cycle</label>
+        <select id="sub-cycle">
+          <option value="monthly">Monthly</option><option value="termly">Termly (3 months)</option>
+          <option value="annual">Annual</option><option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div><label>Starts on</label><input type="date" id="sub-start"></div>
+        <div><label>Expires on</label><input type="date" id="sub-expires"></div>
+      </div>
+      <div class="grid-2">
+        <div><label>Grace days (after expiry)</label><input type="number" id="sub-grace" min="0" max="90" value="7"></div>
+        <div><label>Status</label><select id="sub-status"><option value="active">active</option><option value="suspended">suspended</option></select></div>
+      </div>
+      <label>Renewal / payment link (shown on the lock screen)</label>
+      <input type="url" id="sub-renew" placeholder="https://paystack.shop/…">
+      <label>Custom lock message (optional)</label>
+      <input type="text" id="sub-lockmsg" placeholder="The subscription for this platform has expired…">
+
+      <div class="flex-gap" style="margin-top:12px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="saveLicense()">💾 Save License</button>
+        <button class="btn btn-outline" onclick="quickExtend(30)">+30 days</button>
+        <button class="btn btn-outline" onclick="quickExtend(90)">+90 days</button>
+        <button class="btn btn-outline" onclick="quickExtend(365)">+1 year</button>
+        <button class="btn btn-outline" onclick="lockLicense()">🔒 Test Lock Screen</button>
+      </div>
+      <p style="font-size:.75rem;color:var(--text-muted);margin-top:8px;">Quick-extend uses the owner RPC <span class="code-chip">extend_site_license()</span> — one click after a renewal payment is received.</p>
+    </div>
+
+    <!-- ═══════════ OFFLINE PERPETUAL TOKEN ═══════════ -->
+    <div class="card">
+      <h2>🔐 Offline Perpetual Token Engine</h2>
+      <p style="font-size:.85rem;color:var(--text-muted);">A cryptographic HMAC-SHA256 certificate that verifies <b>completely offline</b> — no phone-home, no server. Generate a token for this institution and keep it with the ownership documents.</p>
+
+      <label>Institution name (as licensed)</label>
+      <input type="text" id="tok-name" placeholder="e.g. God of Seed Academy">
+      <div class="grid-2">
+        <div><label>Plan</label><select id="tok-plan"><option>Enterprise Perpetual</option><option>Enterprise Whitelabel</option><option>Institutional License</option></select></div>
+        <div><label>Valid for (days, 0 = forever)</label><input type="number" id="tok-days" min="0" value="0"></div>
+      </div>
+      <div class="flex-gap" style="margin-top:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="generateToken()">⚙️ Generate Token</button>
+        <button class="btn btn-outline" onclick="applyToken()">✅ Apply &amp; Verify Token</button>
+      </div>
+      <label style="margin-top:12px;">Token</label>
+      <textarea id="tok-out" rows="4" style="font-family:ui-monospace,Consolas,monospace;font-size:10.5px;" readonly placeholder="Generate or paste a token here, then Apply & Verify."></textarea>
+      <div id="tok-verify" style="font-size:13px;margin-top:8px;"></div>
+
+      <h3 style="margin-top:18px;">Registry (optional, authoritative)</h3>
+      <p style="font-size:.8rem;color:var(--text-muted);">A remote JSON on hosting the client does not control. When configured, its verdict overrides local rows — local edits cannot suspend or extend terms. Managed in Settings → platform_settings.<span class="code-chip">license_registry_url</span>.</p>
+      <div id="registry-state" style="font-size:13px;"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ HOW IT WORKS ═══════════ -->
+  <div class="card">
+    <h2>🧠 How the dual engine works</h2>
+    <div class="grid-3">
+      <div class="stat-box" style="text-align:left;">
+        <div class="stat-lbl">Evaluation order</div>
+        <div class="kv"><span>1. Remote registry</span><b>if configured</b></div>
+        <div class="kv"><span>2. Supabase site_license</span><b>row id = 1</b></div>
+        <div class="kv"><span>3. Baked config fallback</span><b>always present</b></div>
+      </div>
+      <div class="stat-box" style="text-align:left;">
+        <div class="stat-lbl">States</div>
+        <div class="kv"><span>lifetime / active</span><b style="color:var(--primary)">normal</b></div>
+        <div class="kv"><span>warning</span><b style="color:var(--warning)">≤ 30 days left</b></div>
+        <div class="kv"><span>grace</span><b style="color:var(--danger)">expired + grace</b></div>
+        <div class="kv"><span>expired / suspended</span><b style="color:var(--danger)">full lock</b></div>
+      </div>
+      <div class="stat-box" style="text-align:left;">
+        <div class="stat-lbl">Anti-tamper layers</div>
+        <div class="kv"><span>Runs on every page</span><b>pre-boot</b></div>
+        <div class="kv"><span>Re-checks</span><b>15 min / refocus</b></div>
+        <div class="kv"><span>Lock UI</span><b>closed Shadow DOM</b></div>
+        <div class="kv"><span>Row signature</span><b>SHA-256</b></div>
+      </div>
+    </div>
+    <p style="font-size:.78rem;color:var(--text-muted);margin:10px 0 0;">Honest note: code on client-controlled hosting can never be 100% tamper-proof. These layers make bypass non-trivial, and the optional registry keeps the authoritative status in the proprietor's hands.</p>
+  </div>
+</main>
+
+<footer class="app-footer">
+  HMG Academy CBT Pro Enterprise · Built with Free-Tier Resilient Architecture · HMG Concepts
+</footer>
+
+/* ═══ Builder App shim (PHASE 12J) ═══════════════════════════════════
+   These console pages are BUILDER tools and no longer ship on client
+   platforms. They run on the builder's own deployment (the Generator
+   package), so they carry a small self-contained App shim instead of the
+   client platform's app.js. Point it at the BUILDER's Supabase project
+   (override anytime via localStorage: BUILDER_SB_URL / BUILDER_SB_KEY). */
+<script>
+(function () {
+  if (window.App) return;
+  const SB_URL = localStorage.getItem('BUILDER_SB_URL') || 'https://pstnsaqjshmtintjrnas.supabase.co';
+  const SB_KEY = localStorage.getItem('BUILDER_SB_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdG5zYXFqc2htdGludGpybmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDEzODUsImV4cCI6MjA5MTI3NzM4NX0.KNVgpVN0xp1njin1HL3udntc7psfzjnz7mqzpEN_Z6w';
+  const read = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (_) { return null; } };
+  const getSession = () => read('cbt_session') || read('cbt_teacher_session') || read('cbt_pro_session') || read('cbt_admin_session');
+  window.App = {
+    SB_URL, SB_KEY, institutionName: 'HMG Concepts — Builder Console', publicSettings: null,
+    getSession,
+    getAdminSession() { return read('cbt_admin_session') || null; },
+    getBestSession() { return this.getAdminSession() || getSession(); },
+    async sbFetch(path, method = 'GET', body = null) {
+      const session = getSession();
+      const token = (session && session.access_token) || SB_KEY;
+      const headers = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+      if (method === 'POST') headers['Prefer'] = 'return=representation';
+      const res = await fetch(SB_URL + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+      if (!res.ok) { let m = 'HTTP ' + res.status; try { const j = await res.json(); m = (j.message || j.error || m); } catch (_) {} throw new Error(m); }
+      return res.status === 204 ? [] : res.json();
+    },
+    async sbRpc(name, body = {}) { return this.sbFetch('/rest/v1/rpc/' + name, 'POST', body); },
+    async loadPublicSettings() {
+      try { const r = await this.sbFetch('/rest/v1/platform_settings?select=*&limit=1'); this.publicSettings = (r && r[0]) || null; } catch (_) {}
+      return this.publicSettings;
+    }
+  };
+})();
+</script>
+
+<script src="assets/js/license.js"></script>
+<script src="assets/js/site-license.js"></script>
+<script>
+let isOwner = false;
+
+async function roleCheck() {
+  const s = App.getBestSession();
+  const badge = document.getElementById('role-badge');
+  if (!s || !s.user) { badge.textContent = 'Not signed in'; badge.className = 'badge badge-warning'; return false; }
+  try {
+    const rows = await App.sbFetch(`/rest/v1/profiles?email=eq.${encodeURIComponent(s.user.email)}&select=role,status`);
+    const p = rows && rows[0];
+    isOwner = !!(p && p.role === 'super_admin' && p.status === 'active');
+    badge.textContent = p ? (p.role + (isOwner ? ' · owner controls unlocked' : ' · read-only')) : 'unknown';
+    badge.className = 'badge ' + (isOwner ? 'badge-primary' : 'badge-warning');
+  } catch (_) { badge.textContent = 'role unavailable'; }
+  return true;
+}
+
+async function loadKeyState() {
+  await App.loadPublicSettings(true);
+  document.getElementById('lic-inst-name').textContent = App.institutionName;
+  const { result, source, lic, tampered } = await SiteSub.status();
+  const map = {
+    lifetime: ['✅ LIFETIME LICENSE — PERPETUAL', 'st-lifetime', 'One-time purchase. This platform never locks.'],
+    active: ['✅ SUBSCRIPTION ACTIVE', 'st-active', 'Subscription is current. Nothing to do.'],
+    warning: ['⏳ EXPIRING SOON', 'st-warning', 'The subscription expires within 30 days — arrange renewal to avoid interruption.'],
+    grace: ['⚠️ GRACE PERIOD', 'st-grace', 'The subscription has expired. The portal locks when the grace days run out.'],
+    expired: ['🔴 EXPIRED — PORTAL LOCKED', 'st-expired', 'The grace period has ended. Users see the renewal lock screen until the proprietor extends the subscription.'],
+    suspended: ['⛔ SUSPENDED', 'st-suspended', 'Suspended by the proprietor. Users see the suspension lock screen.']
+  };
+  const [label, cls, note] = map[result.state] || map.active;
+  const st = document.getElementById('live-state');
+  st.textContent = label; st.className = 'state-badge ' + cls;
+  document.getElementById('lic-plan').textContent = lic.plan || '—';
+  document.getElementById('kv-model').textContent = lic.model;
+  document.getElementById('kv-expires').textContent = lic.expires_on || (lic.model === 'lifetime' ? 'Never' : '—');
+  document.getElementById('kv-grace').textContent = lic.grace_days + ' days';
+  document.getElementById('kv-source').textContent = source + (tampered ? ' (⚠ signature mismatch — possible tampering)' : '');
+  document.getElementById('state-note').textContent = (result.daysLeft != null ? `${result.daysLeft} day(s) remaining. ` : result.daysOver != null ? `${result.daysOver} day(s) past the grace deadline. ` : '') + note;
+
+  // prefill manager
+  document.getElementById('sub-model').value = lic.model;
+  document.getElementById('sub-cycle').value = lic.cycle || 'termly';
+  document.getElementById('sub-grace').value = lic.grace_days;
+  document.getElementById('sub-status').value = lic.status;
+  document.getElementById('sub-renew').value = lic.renew_url || '';
+  document.getElementById('sub-lockmsg').value = lic.lock_message || '';
+  if (lic.started_on) document.getElementById('sub-start').value = String(lic.started_on).slice(0, 10);
+  if (lic.expires_on) document.getElementById('sub-expires').value = String(lic.expires_on).slice(0, 10);
+  syncCycleVisibility();
+
+  // registry state
+  const regUrl = (App.publicSettings && App.publicSettings.license_registry_url) || (window.CBT_LICENSE && window.CBT_LICENSE.registry) || '';
+  document.getElementById('registry-state').innerHTML = regUrl
+    ? `🔗 Registry configured: <span class="code-chip">${escapeHtml(regUrl)}</span> — ${source === 'registry' ? 'currently AUTHORITATIVE (its verdict won).' : 'currently unreachable — falling back to the database row.'}`
+    : '⚪ No registry configured — the Supabase site_license row is authoritative.';
+
+  // offline token status
+  try {
+    const saved = (await App.sbFetch('/rest/v1/site_license?id=eq.1&select=license_token')).catch(() => []);
+    const tokRow = saved && saved[0];
+    if (tokRow && tokRow.license_token) {
+      document.getElementById('tok-out').value = tokRow.license_token;
+      verifyToken(tokRow.license_token);
+    } else {
+      const local = localStorage.getItem('cbt_offline_token');
+      if (local) { document.getElementById('tok-out').value = local; verifyToken(local); }
+    }
+  } catch (_) {}
+}
+
+function syncCycleVisibility() {
+  document.getElementById('sub-cycle-box').style.display = document.getElementById('sub-model').value === 'subscription' ? 'block' : 'none';
+}
+
+async function saveLicense() {
+  if (!isOwner) return showToast('Only the super_admin (proprietor) can change the site license.', 'danger');
+  const lic = {
+    model: document.getElementById('sub-model').value,
+    cycle: document.getElementById('sub-cycle').value,
+    started_on: document.getElementById('sub-start').value || null,
+    expires_on: document.getElementById('sub-expires').value || null,
+    grace_days: +document.getElementById('sub-grace').value || 0,
+    status: document.getElementById('sub-status').value,
+    renew_url: document.getElementById('sub-renew').value.trim(),
+    lock_message: document.getElementById('sub-lockmsg').value.trim()
+  };
+  try {
+    lic.signature = await SiteSub.signature(lic); // tamper evidence
+    await App.sbRpc('save_site_license', { p_license: lic });
+    showToast('License saved & signed ✓ every page re-evaluates on next load.', 'success');
+    loadKeyState();
+  } catch (e) { showToast('Save failed: ' + (e.message || e), 'danger'); }
+}
+
+async function quickExtend(days) {
+  if (!isOwner) return showToast('Owner only.', 'danger');
+  if (!confirm(`Extend the subscription by ${days} day(s)? (For lifetime licenses this is a no-op safety.)`)) return;
+  try {
+    const r = await App.sbRpc('extend_site_license', { p_days: days });
+    const res = Array.isArray(r) ? r[0] : r;
+    showToast(`Extended ✓ new expiry: ${res?.new_expiry ?? '(see table)'} — re-sign below to refresh tamper evidence.`, 'success', 6000);
+    // re-sign after extend (RPC clears signature)
+    setTimeout(() => saveLicense(), 400);
+  } catch (e) { showToast('Extend failed: ' + (e.message || e), 'danger'); }
+}
+
+function lockLicense() {
+  const fake = { model: 'subscription', status: 'suspended', lock_message: document.getElementById('sub-lockmsg').value, plan: document.getElementById('lic-plan').textContent, expires_on: null, grace_days: 0, renew_url: '' };
+  SiteSub.applyUi({ state: 'suspended', lic: SiteSub.normalize(fake) }, SiteSub.normalize(fake));
+  showToast('Lock screen test rendered — reload the page to clear it.', 'info', 6000);
+}
+
+/* ── Offline token engine ── */
+async function generateToken() {
+  const name = document.getElementById('tok-name').value.trim() || App.institutionName;
+  const plan = document.getElementById('tok-plan').value;
+  const days = +document.getElementById('tok-days').value || 0;
+  const token = await SiteLicense.generateToken(name, plan, ['*'], 0, days);
+  document.getElementById('tok-out').value = token;
+  verifyToken(token);
+}
+
+async function applyToken() {
+  const token = document.getElementById('tok-out').value.trim();
+  if (!token) return showToast('Generate or paste a token first.', 'info');
+  if (!isOwner) return showToast('Only the super_admin can apply a token to the site.', 'danger');
+  const v = await verifyToken(token);
+  if (v && v.valid) {
+    try {
+      await App.sbRpc('save_platform_settings', { p_patch: {} }); // touch: ensures settings row exists
+      await App.sbFetch('/rest/v1/site_license?id=eq.1', 'PATCH', { license_token: token }).catch(async () => {
+        await App.sbRpc('save_site_license', { p_license: { model: 'lifetime', license_token: token } });
+      });
+      localStorage.setItem('cbt_offline_token', token);
+      showToast('Token applied to the site license row ✓', 'success');
+    } catch (e) { showToast('Could not persist token: ' + (e.message || e), 'danger'); }
+  }
+}
+
+async function verifyToken(token) {
+  const box = document.getElementById('tok-verify');
+  const v = await SiteLicense.parseToken(token);
+  if (v.valid) {
+    box.innerHTML = `<div style="color:var(--primary);">✅ <b>VALID</b> — ${escapeHtml(v.institutionName)} · ${escapeHtml(v.plan)}<br><small>Issued ${v.issuedAt ? new Date(v.issuedAt).toLocaleDateString() : '—'} · Expires ${v.expiresAt ? String(v.expiresAt).slice(0, 10) : 'never (perpetual)'} · Candidates: ${escapeHtml(String(v.maxCandidates))}</small></div>`;
+  } else {
+    box.innerHTML = `<div style="color:var(--danger);">❌ ${escapeHtml(v.error || 'Invalid token')}</div>`;
+  }
+  return v;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const signedIn = await roleCheck();
+  await loadKeyState();
+  document.getElementById('sub-model').addEventListener('change', syncCycleVisibility);
+  document.getElementById('tok-name').value = App.institutionName;
+  void signedIn;
+});
+</script>
+</body>
+</html>
