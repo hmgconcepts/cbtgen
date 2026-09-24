@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Keep dynamic Supabase API requests outside crawler scope while allowing all static pages.
+Disallow: /*?access_token=
+Disallow: /*?refresh_token=
+
+# After you deploy, this line must point to your live URL. If you left the
+# Deployment URL blank in the generator, replace the placeholder below with
+# your real address (e.g. https://my-school.vercel.app).
+Sitemap: __CLIENT_SITE_URL__/sitemap.xml
+Host: __CLIENT_SITE_URL__
