@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deployment Repair Center — HMG CBT Builder Console</title>
+  <meta name="description" content="Operator tool: verify a client platform deployment live, delete stale files with one-click GitHub deep links, and restore the anti-pause workflow files.">
+  <style>
+    :root{--bg:#0f172a;--surface:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8;--ok:#10b981;--bad:#ef4444;--warn:#f59e0b;--link:#93c5fd}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.6}
+    .hdr{display:flex;gap:12px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--border);background:#0b1220;flex-wrap:wrap}
+    .hdr a{color:#fff;text-decoration:none;font-weight:800}
+    .hdr .sub a{color:var(--link);font-size:13px;font-weight:600}
+    main{max-width:1000px;margin:0 auto;padding:26px 20px 60px}
+    h1{font-size:clamp(22px,3.5vw,32px);margin:8px 0 4px}
+    h2{font-size:18px;margin:34px 0 10px;padding-top:18px;border-top:1px solid var(--border)}
+    p{color:var(--muted)}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin:12px 0}
+    table{width:100%;border-collapse:collapse;font-size:13.5px}
+    th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+    th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+    a{color:var(--link)}
+    .btn{display:inline-block;border:0;border-radius:9px;background:var(--ok);color:#04291d;font-weight:800;padding:9px 14px;cursor:pointer;text-decoration:none;font-size:13px}
+    .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+    .btn.red{background:var(--bad);color:#fff}
+    code{background:#0b1220;border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:12px;color:var(--ok)}
+    textarea{width:100%;min-height:130px;background:#0b1220;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px;font-family:ui-monospace,Consolas,monospace;font-size:11.5px}
+    .tag{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:800}
+    .tag.ok{background:rgba(16,185,129,.15);color:var(--ok)}
+    .tag.warn{background:rgba(245,158,11,.15);color:var(--warn)}
+    .tag.bad{background:rgba(239,68,68,.15);color:var(--bad)}
+    .small{font-size:12px;color:var(--muted)}
+    input{background:#0b1220;border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font-size:13px}
+  </style>
+</head>
+<body>
+<div class="hdr">
+  <a href="generator.html">🛠️ HMG CBT Generator — Builder Console</a><span style="opacity:.6">·</span>
+  <span class="sub"><a href="repair-center.html">🔧 Repair Center</a> · <a href="license.html">📜 License Console</a> · <a href="client-monitor.html">📡 Client Monitor</a> · <a href="generator.html">🏭 Build a Client Site</a></span>
+  <span style="margin-left:auto;font-size:11.5px;opacity:.7;">HMG Concepts internal tooling — never shipped to client platforms</span>
+</div>
+<main>
+  <h1>🔧 Deployment Repair Center</h1>
+  <p>Verify a client-platform deployment against the live site, then fix any leftover with <b>one-click GitHub deep links</b>. This tool exists because <b>GitHub's “Add files via upload” can add and overwrite files but can NEVER delete them</b> — retired pages keep serving until you delete them here.</p>
+
+  <div class="card">
+    <b>Target deployment</b>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:center">
+      <label class="small">Repo owner/name</label><input id="cfg-repo" value="hmgconcepts/hmgacademycbtsystem">
+      <label class="small">Branch</label><input id="cfg-branch" value="main">
+      <label class="small">Live URL</label><input id="cfg-site" value="https://hmgacademycbtsystem.vercel.app" style="flex:1;min-width:220px">
+      <button class="btn ghost" onclick="saveCfg()">Save</button>
+    </div>
+    <p class="small" id="cfg-note">Settings persist in this browser (localStorage). Change them to inspect any other client deployment.</p>
+  </div>
+
+  <h2>1 — Live verification checklist <span class="tag ok">do this first</span></h2>
+  <p>Open each link in a new tab and compare with the “You should see” column. Everything green = the deployment is healthy.</p>
+  <table id="checks">
+    <tr><th>Open</th><th>You should see</th><th>If not → fix</th></tr>
+    <tr><td><a id="c1" target="_blank">/license.html</a></td>
+        <td><span class="tag ok">PASS</span> 404 (file deleted) or an instant redirect Home (“This page has moved”). <b>Never</b> a working licence console.</td>
+        <td>A working console → <a id="f1" target="_blank">delete license.html</a> (section 2)</td></tr>
+    <tr><td><a id="c2" target="_blank">/client-monitor.html</a></td>
+        <td><span class="tag ok">PASS</span> 404 or instant redirect Home.</td>
+        <td>Working monitor → <a id="f2" target="_blank">delete client-monitor.html</a></td></tr>
+    <tr><td><a id="c3" target="_blank">/deployment_validator.html</a></td>
+        <td><span class="tag ok">PASS</span> Every row green — including “Builder-tool leakage” and “Stale upload artifacts”.</td>
+        <td>Follow the red row's printed fix</td></tr>
+    <tr><td><a id="c4" target="_blank">/storage</a> <span class="small">(in a private/incognito window)</span></td>
+        <td><span class="tag ok">PASS</span> Redirect to the admin sign-in. The storage console must NOT render for anonymous visitors.</td>
+        <td>Renders → your deployed app.js is older than Phase 12K — re-upload the current build</td></tr>
+    <tr><td><a id="c5" target="_blank">GitHub → Actions tab</a></td>
+        <td><span class="tag ok">PASS</span> “Supabase Heartbeat” and “Supabase Auto-Restore Watchdog” listed with successful runs.</td>
+        <td>Missing → restore them (section 3)</td></tr>
+    <tr><td><a id="c6" target="_blank">/platform-health.html</a></td>
+        <td><span class="tag ok">PASS</span> Latency + RPC smokes green, heartbeat evidence current, security grade A/B.</td>
+        <td>Follow the grade's printed fix</td></tr>
+  </table>
+
+  <h2>2 — One-click cleanup <span class="tag warn">leftovers from old uploads</span></h2>
+  <p>Each button opens the file on GitHub. Click <b>⋮ (top-right) → Delete file → Commit changes</b>. Safe: none of these exist in current builds.</p>
+  <table>
+    <tr><th>File</th><th>Why</th><th>Action</th></tr>
+    <tr><td><code>license.html</code></td><td>Retired builder tool — must not exist on a client platform. Current builds stopped shipping it (tombstone removed in Phase 12L); the live copy lingers only until deleted.</td><td><a class="btn red" id="d1" target="_blank">Open on GitHub → delete</a></td></tr>
+    <tr><td><code>client-monitor.html</code></td><td>Retired builder tool — same reason.</td><td><a class="btn red" id="d2" target="_blank">Open on GitHub → delete</a></td></tr>
+    <tr><td><code>.github/a</code></td><td>Empty junk file accidentally created while re-adding the workflows.</td><td><a class="btn red" id="d3" target="_blank">Open on GitHub → delete</a></td></tr>
+    <tr><td><code>,github/…</code> (any file starting with a comma)</td><td>Mangled upload of the .github folder.</td><td><a class="btn red" id="d4" target="_blank">Check the repo root</a> — delete any <code>,github</code> entries the same way</td></tr>
+  </table>
+
+  <h2>3 — Restore the anti-pause workflows <span class="tag warn">if the Actions tab is empty</span></h2>
+  <p>Two of the 10 free-tier anti-pause layers live in <code>.github/workflows/</code>. If they are missing: click a button below (it opens GitHub's new-file page with the path pre-filled), then click <b>Copy content</b>, paste into the editor, and <b>Commit changes</b>.</p>
+  <div class="card">
+    <p style="margin:0 0 8px"><b>supabase-heartbeat.yml</b> — twice-weekly verified database write</p>
+    <a class="btn" id="w1" target="_blank">Create .github/workflows/supabase-heartbeat.yml</a>
+    <button class="btn ghost" onclick="copyTa('ta-hb')">Copy content</button>
+    <textarea id="ta-hb" readonly># ============================================================
+# Supabase Free-Tier Heartbeat &amp; Anti-Pause — V4.0 (Phase 2)
+# ------------------------------------------------------------
+# Supabase pauses FREE-tier projects after ~7 days without
+# REAL database activity. This workflow performs a genuine
+# database WRITE through the sc_keep_alive() RPC (installed by
+# COMPLETE_SCHEMA_SQL.sql) twice a week, so the project never
+# crosses the 7-day inactivity window. It then VERIFIES the
+# write actually happened (the RPC returns the new timestamp)
+# and fails loudly if it did not — GitHub emails you on failure.
+#
+# ONE-TIME SETUP (2 minutes):
+#   GitHub repo → Settings → Secrets and variables → Actions →
+#   add two repository secrets:
+#     SUPABASE_URL        e.g. https://abcdefgh.supabase.co
+#     SUPABASE_ANON_KEY   your project&#x27;s anon/public key
+#
+# V4.0 — FULLY SELF-SUSTAINING:
+#   1. WATCHDOG: after writing the heartbeat, the workflow
+#      VERIFIES the database really recorded it (a timestamp in
+#      the RPC response is the proof of a successful UPDATE).
+#   2. SELF-COMMITTING: GitHub disables *scheduled* workflows in
+#      repos with no commits for 60 days. This workflow resets
+#      that clock BY ITSELF — whenever the repository&#x27;s last
+#      commit is older than 30 days, it commits a tiny timestamp
+#      file (.github/last-keepalive.txt) and pushes. The 60-day
+#      freeze can never be reached. No human action required.
+#   3. AUTO-RESTORE companion: supabase-auto-restore.yml checks
+#      the project daily and restores it automatically if it is
+#      ever paused anyway (separate secrets, optional).
+#
+# Secrets unset? The workflow skips gracefully with a notice
+# (safe default) instead of failing.
+# ============================================================
+name: Supabase Free-Tier Heartbeat &amp; Anti-Pause
+
+on:
+  schedule:
+    # 06:17 UTC every Monday and Thursday (max gap = 4 days, well inside the 7-day window)
+    - cron: &#x27;17 6 * * 1,4&#x27;
+  workflow_dispatch: {}
+
+# &quot;contents: write&quot; is required ONLY by the self-commit step below.
+# It grants this workflow&#x27;s built-in GITHUB_TOKEN push access to THIS
+# repo and nothing else.
+permissions:
+  contents: write
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Heartbeat write to Supabase (sc_keep_alive RPC)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          set -e
+          if [ -z &quot;$SUPABASE_URL&quot; ] || [ -z &quot;$SUPABASE_ANON_KEY&quot; ]; then
+            echo &quot;::notice::SUPABASE_URL / SUPABASE_ANON_KEY secrets are not set. Add them in Settings → Secrets and variables → Actions to activate the heartbeat (the platform still has other protection layers).&quot;
+            exit 0
+          fi
+          code=$(curl -s -o /tmp/resp.txt -w &#x27;%{http_code}&#x27; \
+            -X POST &quot;$SUPABASE_URL/rest/v1/rpc/sc_keep_alive&quot; \
+            -H &quot;apikey: $SUPABASE_ANON_KEY&quot; \
+            -H &quot;Authorization: Bearer $SUPABASE_ANON_KEY&quot; \
+            -H &quot;Content-Type: application/json&quot; \
+            -d &#x27;{&quot;p_src&quot;:&quot;github-actions&quot;}&#x27;)
+          echo &quot;Response: $(cat /tmp/resp.txt)&quot;
+          if [ &quot;$code&quot; -lt 200 ] || [ &quot;$code&quot; -ge 300 ]; then
+            echo &quot;::error::Keep-alive failed (HTTP $code). If the RPC is missing, run COMPLETE_SCHEMA_SQL.sql in the Supabase SQL Editor (it installs sc_keep_alive).&quot;
+            exit 1
+          fi
+          # V4.0 WATCHDOG: HTTP 200 alone is not proof — confirm the database
+          # actually recorded the write. sc_keep_alive() returns the NEW
+          # last_ping timestamp, so a timestamp in the body IS the proof.
+          if grep -Eq &#x27;20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}&#x27; /tmp/resp.txt; then
+            echo &quot;✅ Keep-alive heartbeat written AND verified (HTTP $code, timestamp returned). Supabase inactivity timer reset.&quot;
+          elif grep -q &quot;heartbeat written&quot; /tmp/resp.txt; then
+            echo &quot;✅ Keep-alive heartbeat written AND verified (HTTP $code). Supabase inactivity timer reset.&quot;
+          else
+            echo &quot;::error::HTTP $code received but the response body does not contain the confirmation timestamp the RPC returns. Run COMPLETE_SCHEMA_SQL.sql once in the Supabase SQL Editor, then re-run this workflow.&quot;
+            exit 1
+          fi
+
+      # ---------- Layer 9: self-commit — resets GitHub&#x27;s 60-day clock ----------
+      # GitHub disables scheduled workflows after 60 days without a commit.
+      # Whenever the last commit is older than 30 days, this step commits a
+      # one-line timestamp file, so the repository NEVER looks inactive.
+      - name: Check out repository (needed for the self-commit step)
+        uses: actions/checkout@v4
+
+      - name: Self-commit to reset the 60-day scheduler clock (only when needed)
+        run: |
+          set -e
+          last=$(git log -1 --format=%ct)
+          now=$(date +%s)
+          age_days=$(( (now - last) / 86400 ))
+          echo &quot;Last commit was ${age_days} day(s) ago.&quot;
+          if [ &quot;$age_days&quot; -lt 30 ]; then
+            echo &quot;✅ Repository is active (last commit &lt; 30 days). No self-commit needed — GitHub&#x27;s 60-day scheduler freeze is not a risk.&quot;
+            exit 0
+          fi
+          git config user.name  &quot;cbt-keepalive-bot&quot;
+          git config user.email &quot;keepalive-bot@users.noreply.github.com&quot;
+          date -u +&quot;Last automated keepalive commit: %Y-%m-%dT%H:%M:%SZ&quot; &gt; .github/last-keepalive.txt
+          git add .github/last-keepalive.txt
+          git commit -m &quot;chore: automated keepalive commit — resets GitHub&#x27;s 60-day scheduler clock [skip ci]&quot;
+          if git push; then
+            echo &quot;✅ Self-commit pushed. GitHub&#x27;s 60-day scheduled-workflow freeze clock has been reset automatically.&quot;
+          else
+            echo &quot;::warning::Could not push the keepalive commit (branch protection or restricted workflow permissions?). Enable it via repo Settings → Actions → General → Workflow permissions → &#x27;Read and write permissions&#x27;, or push any small commit manually before the 60-day mark.&quot;
+          fi
+</textarea>
+  </div>
+  <div class="card">
+    <p style="margin:0 0 8px"><b>supabase-auto-restore.yml</b> — daily auto-restore watchdog (layer 10)</p>
+    <a class="btn" id="w2" target="_blank">Create .github/workflows/supabase-auto-restore.yml</a>
+    <button class="btn ghost" onclick="copyTa('ta-ar')">Copy content</button>
+    <textarea id="ta-ar" readonly># ============================================================
+# Supabase Auto-Restore Watchdog — V4.0 (Layer 10)
+# ------------------------------------------------------------
+# The last line of defence. Every keep-alive layer PREVENTS the
+# pause; this workflow UNDOES it automatically if it ever happens
+# anyway (e.g. every pinger failed in the same week).
+#
+# Daily, it asks the Supabase Management API for the project&#x27;s
+# status. If the project is INACTIVE (paused), it calls the
+# official restore endpoint — the same thing the &quot;Restore
+# project&quot; button in the dashboard does — waits for the project
+# to come back, then writes a heartbeat so the timer restarts.
+#
+# ONE-TIME SETUP (2 minutes) — two repository secrets
+# (Settings → Secrets and variables → Actions → New repository secret):
+#   SUPABASE_ACCESS_TOKEN  a Personal Access Token (starts with sbp_)
+#                          from https://supabase.com/dashboard/account/tokens
+#                          → &quot;Generate new token&quot;, name it e.g. auto-restore
+#   SUPABASE_PROJECT_REF   the 20-character code from your dashboard URL:
+#                          https://supabase.com/dashboard/project/THIS-PART
+#
+# ⚠️ The access token manages your WHOLE Supabase account — store it
+#    ONLY as a GitHub secret, never in code or config files.
+# If the secrets are not set, the workflow skips gracefully with a
+# notice (safe default for repos that don&#x27;t want this layer).
+# ============================================================
+name: Supabase Auto-Restore Watchdog
+
+on:
+  schedule:
+    # 05:43 UTC every day
+    - cron: &#x27;43 5 * * *&#x27;
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check project status and auto-restore if paused
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          set -e
+          if [ -z &quot;$SUPABASE_ACCESS_TOKEN&quot; ] || [ -z &quot;$SUPABASE_PROJECT_REF&quot; ]; then
+            echo &quot;::notice::SUPABASE_ACCESS_TOKEN / SUPABASE_PROJECT_REF secrets not set — auto-restore watchdog inactive (all prevention layers still run). Add them to enable automatic un-pausing.&quot;
+            exit 0
+          fi
+
+          echo &quot;Checking project $SUPABASE_PROJECT_REF status…&quot;
+          status=$(curl -s &quot;https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF&quot; \
+            -H &quot;Authorization: Bearer $SUPABASE_ACCESS_TOKEN&quot; \
+            | grep -o &#x27;&quot;status&quot;:&quot;[^&quot;]*&quot;&#x27; | head -1 | cut -d&#x27;&quot;&#x27; -f4)
+          echo &quot;Reported status: ${status:-unknown}&quot;
+
+          if [ &quot;$status&quot; != &quot;inactive&quot; ] &amp;&amp; [ &quot;$status&quot; != &quot;paused&quot; ]; then
+            echo &quot;✅ Project is ${status:-reachable} — nothing to restore.&quot;
+            exit 0
+          fi
+
+          echo &quot;🔴 Project is PAUSED. Requesting restore (this is what the dashboard&#x27;s Restore button does)…&quot;
+          code=$(curl -s -o /tmp/restore.txt -w &#x27;%{http_code}&#x27; -X POST \
+            &quot;https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/restore&quot; \
+            -H &quot;Authorization: Bearer $SUPABASE_ACCESS_TOKEN&quot;)
+          echo &quot;Restore endpoint HTTP $code: $(cat /tmp/restore.txt)&quot;
+          if [ &quot;$code&quot; -lt 200 ] || [ &quot;$code&quot; -ge 300 ]; then
+            echo &quot;::error::Restore request failed (HTTP $code). Restore manually: Supabase Dashboard → your project → &#x27;Restore project&#x27;.&quot;
+            exit 1
+          fi
+
+          # Wait for the project to come back (restores take 3-10 minutes)
+          echo &quot;Waiting for the project to come back online…&quot;
+          for i in $(seq 1 40); do
+            sleep 20
+            probe=$(curl -s -o /dev/null -w &#x27;%{http_code}&#x27; \
+              &quot;$SUPABASE_URL/rest/v1/institutions?select=id&amp;limit=1&quot; \
+              -H &quot;apikey: $SUPABASE_ANON_KEY&quot; \
+              -H &quot;Authorization: Bearer $SUPABASE_ANON_KEY&quot; || true)
+            echo &quot;  attempt $i: REST answered HTTP ${probe:-unreachable}&quot;
+            if [ &quot;$probe&quot; = &quot;200&quot; ]; then
+              # Write a fresh heartbeat so the inactivity timer restarts NOW
+              curl -s -X POST &quot;$SUPABASE_URL/rest/v1/rpc/sc_keep_alive&quot; \
+                -H &quot;apikey: $SUPABASE_ANON_KEY&quot; \
+                -H &quot;Authorization: Bearer $SUPABASE_ANON_KEY&quot; \
+                -H &quot;Content-Type: application/json&quot; \
+                -d &#x27;{&quot;p_src&quot;:&quot;auto-restore-watchdog&quot;}&#x27; || true
+              echo &quot;✅ PROJECT RESTORED automatically and heartbeat re-armed. Total downtime: minutes, not days.&quot;
+              exit 0
+            fi
+          done
+          echo &quot;::warning::Project had not answered after ~13 minutes. It may still be restoring — check the dashboard; the watchdog will retry tomorrow.&quot;
+</textarea>
+  </div>
+  <p class="small">Secrets the workflows need (<code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code> or the service key where indicated) are set once in repo → Settings → Secrets and variables → Actions. The files' header comments list each one.</p>
+
+  <h2>4 — “I uploaded the new build but the site still looks old”</h2>
+  <div class="card">
+    <p style="margin-top:0">That is the <b>browser service-worker cache</b>, not the deployment. After a redeploy, the previous version can serve until the new service worker installs (usually the second navigation). Since Phase 12L the platform shows a <b>🚀 A new version is available — Refresh now</b> pill when this happens.</p>
+    <p>To see the fresh version immediately: <b>Ctrl+Shift+R</b> (Windows/Linux) or <b>Cmd+Shift+R</b> (Mac) — or DevTools (F12) → Application → Service Workers → <b>Update</b> / <b>Unregister</b>. Verify you are on the new build: the footer of any governance page, or <code>sw.js</code> in DevTools, should read <b>hmg-cbt-shell-v12-phase12l-v1</b>.</p>
+  </div>
+</main>
+<script>
+function saveCfg(){try{localStorage.setItem('rc_cfg',JSON.stringify({repo:v('cfg-repo'),branch:v('cfg-branch'),site:v('cfg-site')}));note('Saved.')}catch(e){}}
+function v(id){return document.getElementById(id).value.replace(/\/+$/,'')}
+function note(t){document.getElementById('cfg-note').textContent=t}
+function copyTa(id){var t=document.getElementById(id);t.select();try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}}
+(function(){
+  var c;try{c=JSON.parse(localStorage.getItem('rc_cfg')||'null')}catch(e){}
+  if(c&&c.repo){document.getElementById('cfg-repo').value=c.repo;document.getElementById('cfg-branch').value=c.branch||'main';document.getElementById('cfg-site').value=c.site||'';note('Loaded saved settings.')}
+  var repo=v('cfg-repo'),br=v('cfg-branch')||'main',site=v('cfg-site')||'https://hmgacademycbtsystem.vercel.app';
+  var gh='https://github.com/'+repo+'/';
+  var el=function(id,href){var e=document.getElementById(id);if(e)e.href=href};
+  el('c1',site+'/license.html');el('c2',site+'/client-monitor.html');el('c3',site+'/deployment_validator.html');el('c4',site+'/storage');el('c6',site+'/platform-health.html');
+  el('c5',gh+'actions');el('f1',gh+'blob/'+br+'/license.html');el('f2',gh+'blob/'+br+'/client-monitor.html');
+  el('d1',gh+'blob/'+br+'/license.html');el('d2',gh+'blob/'+br+'/client-monitor.html');el('d3',gh+'blob/'+br+'/.github/a');el('d4',gh+'tree/'+br);
+  el('w1',gh+'new/'+br+'?filename=.github/workflows/supabase-heartbeat.yml');el('w2',gh+'new/'+br+'?filename=.github/workflows/supabase-auto-restore.yml');
+})();
+</script>
+</body>
+</html>
