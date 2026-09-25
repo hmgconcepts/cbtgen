@@ -442,6 +442,46 @@ phase build) plus three platform upgrades. Full report:
    every invoked RPC exists in the schema, both nav panes list every page,
    the session-key matrix is consistent, and navigate() targets have views.
 
+## Phase 12 — Subscription Integrity & Client Mode (2026-09-16)
+
+**Subscription integrity (client hardening):**
+- Client builds (generator output) ship **no License console and no Client Monitor** — clients can never bypass subscription mode. The license *engine* still runs everywhere; only the consoles are builder-side.
+- `extend_site_license` / `save_site_license` RPCs on client deployments are swapped to a provider-managed denial ("License changes on this deployment are managed by the platform provider (HMG Concepts)") — safe even in the client's own SQL editor.
+- All renewal banners/lock screens and the bot's license KB answers are **provider-managed**: contact HMG Concepts (WhatsApp +234 810 086 6322 · hismarvellousgrace@gmail.com) or the Renew button — no self-service quick-extend wording on client builds.
+
+**Builder control room (master only):**
+- 🫀 **Client Monitor keep-alive sweep** — one click pings every registered client's `sc_keep_alive` RPC (using each client's stored Supabase URL + anon key) with per-client warmed/unreachable/skipped reporting. Weekly routine: no client database ever goes cold, expired or not.
+
+**Multi-subject publish fix:**
+- Publish Combined Assessment now always sends `csv_data` (+ explicit `exam_mode`; per-subject rows carry both `questions` and `csv_data` reader keys) — kills the live `null value in column "csv_data" … NOT NULL constraint` failure on every schema state.
+- Duplicate keeps `is_multi_subject` + `subjects_data` (copies no longer degrade to flat papers); `complete-schema.sql` adds `csv_data`/`subjects_data` SET DEFAULT drift-heal.
+
+**Navigation separation:**
+- Teacher navigation pane no longer lists the 10 administration consoles (Admin Panel, Data & Drive Sync, Disaster Recovery, Storage Manager, Platform Health, Roles & Approvals, Platform Settings, Site License, Audit Log, Client Monitor) — they live in the Admin Panel's own navigation, reached via Portals Home → Admin Sign In.
+
+## Phase 12B — Multi-Subject Student Experience (2026-09-16)
+
+**Structured types now work at the student end of CSV-published papers (live bug):**
+- Matching, ordering, categorization and multi-part numeric previously crashed or showed "no items defined" when the paper came through the CSV bridge (Pairs/Items columns are JSON strings). Every question is now normalised once at load — string or array, both render and grade. Multi-part numeric grading, ordering default keys, flag state and jump-to-unanswered also fixed.
+
+**UTME-style subject tabs (School Connect / GOSA Portal parity):**
+- Sticky subject tab bar visible from exam start, with live per-subject (answered/total) counters and ✓ when a subject is complete — counters update without rebuilding widgets under the student's finger.
+- `Next` at a subject boundary flows into the next subject ("Next Subject: Mathematics →"); `prev` at a subject start returns to the previous subject's end. The submit modal opens only after the final question of the final subject and lists every subject's progress (click a row to jump back).
+- Progress line shows "Subject · Q x of y (overall i of N)"; the phantom `prevQuestionRecordTime()` crash on subject switching is gone.
+- Legacy/external papers that ship flat `csv_data` + `subject_breakdown` metadata (the School Connect / GOSA representation) automatically get tabs; the multi-subject builder now publishes that metadata too.
+
+## Phase 12C — GOSA / School Connect Presentation Parity (2026-09-16)
+
+**Question rendering fixed (live bugs):**
+- **Assertion–Reason:** stems display in a tagged badge panel (Assertion / Reason), options are the five canonical A–E statements — never the a/b columns (CSV papers used to show the stems again as "options"). 
+- **Case Study:** the passage renders in its own scrollable panel ("read this first") above the options; CSV-bridge passages prefixed into the question text are split back out so the question line stays clean.
+- **Hot Text:** pill chips with an unmistakable selected state (gradient fill + ✓ + glow + aria-pressed); tap toggles; clear hint.
+
+**Ported from School Connect / GOSA Portal:**
+- 🔊 **Read Aloud** (Alt+R / Alt+S) — per-question, reads question + options for every type (AR stems separately, case-study passage first, matching/ordering/categorization/hot-text items, part labels for multi-part numeric), never the answer key; cancels on question change, submit and tab blur. The button is now actually visible during exams (nothing ever un-hid it before).
+- ❓ **How to Answer** — a legend overlay explaining all 17 question styles in plain language; reading it costs no exam time.
+- 💡 how-to tips above every structured question; essay live word count vs the minimum.
+
 
 ---
 
@@ -645,3 +685,21 @@ The command palette gains “Run the Deployment Validator” — post-deploy ver
 
 ### 5. Tombstones retired
 With the live pages neutralized and deletions one click away, builds no longer ship the tombstone stubs — after deletion the retired builder tools are permanently 404 on client platforms, exactly as directed.
+
+## Phase 12M — Session-Role, Navigation-Flow & Rendering Fixes — 2026-09-25
+
+Three user-reported live bugs, each reproduced behaviourally and fixed at the root. Full analysis: `PHASE12M_BUGFIX_REPORT.md`.
+
+### 1. 🎨 shell.css — components render correctly on EVERY page
+Pages that don't link the platform stylesheet (certificate verification, feature guide, link checker) used to show the injected sidebar/palette unstyled. `assets/css/shell.css` now carries every component style (sidebar, command palette, announcement banner, update pill, breadcrumbs, user & subscription chips) with fallback-aware colours, and `App.injectShellStyles()` auto-injects it on any page app.js runs on — idempotent, offline-precached, and never touching the page's own design.
+
+### 2. 🧭 Navigation flow — no more false “logged out” / “bounced to dashboard”
+- **Role resolution** now uses the best session (admin preferred), honours the role stamp / metadata / JWT claim, and recognises that a `cbt_admin_session` is admin by construction (admin.html verifies admin-ness before ever saving it).
+- **admin.html stamps the verified role** into every saved session (login, adoption, refresh) so the synchronous page-guard always knows an admin.
+- **`?next=` is honored** after sign-in: land exactly where you were headed (allowlisted, clean-URL aware).
+- **Teachers hitting an admin tool** return to their own hub with a friendly “🔒 administrator tool — you're still signed in” banner instead of the admin login screen.
+- **🔒 markers** flag admin-gated tools in the sidebar/palette for non-admins.
+- **Multi-Subject Builder** routes smartly: teacher session → builder; admin without one → Teacher Hub with instructions; the builder's banner explains the workspace split to administrators.
+
+### 3. 🔎 Regression safety
+New `phase12m_session_render_test.js` (52 behavioural checks) reproduces both reported bugs in a VM (role-less admin session + stale teacher alias; teacher on link checker) and asserts the fixed flows, alongside 36 suites and 346 smoke checks.
