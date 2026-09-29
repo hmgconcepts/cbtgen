@@ -203,7 +203,8 @@
      master deployment; keeping it listed is harmless where it is absent. */
   function isRenewalPage() {
     var p = (window.location.pathname.split('/').pop() || 'index.html').split(/[?#]/)[0];
-    return p === 'license.html' || p === 'admin.html';
+    if (p && !/\.[a-z0-9]+$/i.test(p)) p += '.html'; /* 12K: clean-URL hosts serve /storage for storage.html */
+    return p === 'admin.html';
   }
 
   /* EXPIRED-BUT-ALIVE: keep the database warm even when the portal is
