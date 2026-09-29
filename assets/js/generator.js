@@ -209,7 +209,7 @@ const CBTGenerator = {
     pages: [
       'index.html', 'student.html', 'teacher.html', 'cbt-multi.html', 'cbt-prompts.html', 'question-types.html',
       'admin.html', 'admin-data.html', 'storage.html', 'platform-health.html',
-      'status-manager.html', 'settings.html', 'activity_log.html',
+      'status-manager.html', 'settings.html', 'activity_log.html', 'analytics.html',
       'certificate.html', 'deployment_validator.html', 'feature_guide.html',
       'link_checker.html', 'offline.html', 'disaster-recovery.html'
     ],
@@ -220,7 +220,7 @@ const CBTGenerator = {
       'assets/js/cbt-exam-kit.js', 'assets/js/cbt-richtext.js', 'assets/js/csv-bridge.js',
       'assets/js/site-help.js', 'assets/js/chatbot.js', 'assets/js/psychometrics.js', 'sw.js', 'pwa_install_enforcer.js'
     ],
-    styles: ['assets/css/style.css'],
+    styles: ['assets/css/style.css', 'assets/css/shell.css'],
     images: [
       'assets/hmg-academy-logo.png', 'assets/img/hmg-academy-logo.png', 'assets/img/hmg-icon.svg',
       'hmg-academy-logo.png', 'hmg-icon.svg', 'assets/sample-heart-diagram.png'
@@ -240,7 +240,7 @@ const CBTGenerator = {
       'PHASE11_WIRING_AND_COMPLIANCE_AUDIT.md'
     ],
     infra: [
-      'database/complete-schema.sql', 'database/keep-alive.sql', 'database/security-hardening.sql',
+      'database/complete-schema.sql', 'database/platform-integration.sql', 'database/keep-alive.sql', 'database/security-hardening.sql',
       'database/drive-sync.sql', 'database/storage-offload.sql', 'database/demo-seed.sql',
       'database/demo-users.sql',
       'vercel.json', '_headers', '.nojekyll', 'robots.txt',
